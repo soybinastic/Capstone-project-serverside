@@ -10,5 +10,6 @@ namespace ConstructionMaterialOrderingApi.Repositories
     {
         Task RegisterCustomer(CustomerRegisterDto model, string accountId);
         Task<GetCustomerDto> GetCustomerByAccountId(string customerAccountId);
+        Task<bool> Update(UpdateCustomerDto customerDto, string accountId);
     }
 }

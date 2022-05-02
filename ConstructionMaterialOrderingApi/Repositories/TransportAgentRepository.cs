@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ConstructionMaterialOrderingApi.Models;
 using Microsoft.EntityFrameworkCore;
+using ConstructionMaterialOrderingApi.Dtos.HardwareStoreUserDto;
 
 namespace ConstructionMaterialOrderingApi.Repositories
 {
@@ -29,7 +30,18 @@ namespace ConstructionMaterialOrderingApi.Repositories
             await _context.SaveChangesAsync();
             
         }
-
+        public async Task AddTransportAgent(HardwareStoreUserDto storeUserDto, string applicationUserId, int hardwareStoreId)
+        {
+            var transportAgent = new TransportAgent()
+            {
+                AccountId = applicationUserId,
+                HardwareStoreId = hardwareStoreId,
+                BranchId = storeUserDto.BranchId,
+                Name = $"{storeUserDto.FirstName} {storeUserDto.LastName}"
+            };
+            await _context.TransportAgents.AddAsync(transportAgent);
+            await _context.SaveChangesAsync();
+        }
         public async Task<GetTransportAgentDto> GetTransportAgentByAccountId(string accountId)
         {
             var transportAgent = await _context.TransportAgents.Where(t => t.AccountId == accountId)
@@ -44,6 +56,13 @@ namespace ConstructionMaterialOrderingApi.Repositories
             };
 
             return transportAgentDto;
+        }
+
+        public async Task<TransportAgent> GetTransportAgentByAccountID(string accountId)
+        {
+            var transportAgent = await _context.TransportAgents.Where(t => t.AccountId == accountId)
+                .FirstOrDefaultAsync();
+            return transportAgent;
         }
     }
 }

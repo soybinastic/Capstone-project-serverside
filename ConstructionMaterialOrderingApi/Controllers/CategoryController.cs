@@ -19,34 +19,35 @@ namespace ConstructionMaterialOrderingApi.Controllers
     [ApiController]
     public class CategoryController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        
         private readonly ICategoryRepository _categoryRepository;
-        private readonly IHardwareStoreRepository _hardwareStoreRepository;
+        private readonly IHardwareStoreUserRepository _storeUserRepository;
 
-        public CategoryController(UserManager<ApplicationUser> userManager, ICategoryRepository categoryRepository,
-            IHardwareStoreRepository hardwareStoreRepository)
+        public CategoryController(ICategoryRepository categoryRepository, IHardwareStoreUserRepository storeUserRepository)
         {
-            _userManager = userManager;
             _categoryRepository = categoryRepository;
-            _hardwareStoreRepository = hardwareStoreRepository;
+            _storeUserRepository = storeUserRepository;
         }
 
         [HttpPost]
         [Route("/api/category/create-category")]
-        [Authorize(Roles = "StoreOwner")]
+        [Authorize(Roles = "StoreOwner,SuperAdmin,WarehouseAdmin")]
         public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryDto model)
         {
             var hardwareStoreUserId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var hardwareStoreUser = await _userManager.FindByIdAsync(hardwareStoreUserId);
-            var role = await _userManager.GetRolesAsync(hardwareStoreUser);
-            if (role.FirstOrDefault() == "StoreOwner")
-            {
-                var hardwareOwner = await _hardwareStoreRepository.GetHardware(hardwareStoreUser.Id);
-                var result = await _categoryRepository.CreateCategory(hardwareOwner.HardwareStoreId, model);
-                return result ? Ok(new { Success = 1, Message = "Category added successfully." }) : BadRequest(new { Success = 0, Message = "Failed to add category" });
-            }
+            //var hardwareStoreUser = await _userManager.FindByIdAsync(hardwareStoreUserId);
+            //var role = await _userManager.GetRolesAsync(hardwareStoreUser);
+            //if (role.FirstOrDefault() == "StoreOwner")
+            //{
+            //    var hardwareOwner = await _hardwareStoreRepository.GetHardware(hardwareStoreUser.Id);
+            //    var result = await _categoryRepository.CreateCategory(hardwareOwner.HardwareStoreId, model);
+            //    return result ? Ok(new { Success = 1, Message = "Category added successfully." }) : BadRequest(new { Success = 0, Message = "Failed to add category" });
+            //}
 
-            return BadRequest(new { Success = 0, Message = "Something went wrong" });
+            //return BadRequest(new { Success = 0, Message = "Something went wrong" }); 
+            var user = await _storeUserRepository.GetUserByAccountId(hardwareStoreUserId);
+            var result = await _categoryRepository.CreateCategory(user.HardwareStoreId, model);
+            return result ? Ok(new { Success = 1, Message = "Category added successfully." }) : BadRequest(new { Success = 0, Message = "Failed to add category" });
         }
 
         [HttpGet]

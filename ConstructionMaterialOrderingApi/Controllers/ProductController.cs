@@ -30,7 +30,39 @@ namespace ConstructionMaterialOrderingApi.Controllers
             _productRepository = productRepository;
             _hardwareStoreRepository = hardwareStoreRepository;
             _userManager = userManager;
-        } 
+        }
+        [HttpGet]
+        [Route("get-hardwareproducts/{branchId}")]
+        public async Task<IActionResult> GetHardwareProducts([FromRoute] int branchId)
+        {
+            var products = await _productRepository.GetHardwareProducts(branchId);
+            return Ok(ConvertToJson(products));
+        }
+        [HttpGet]
+        [Route("get-hardwareproduct/{branchId}/{productId}")]
+        public async Task<IActionResult> GetHardwareProduct([FromRoute] int branchId, [FromRoute] int productId)
+        {
+            var product = await _productRepository.GetHardwareProduct(branchId, productId);
+            return Ok(ConvertToJson(product));
+        }
+        [HttpGet]
+        [Route("get-hardwareproduct-by-category/{branchId}/{categoryId}")]
+        public async Task<IActionResult> GetHardwareProductByCategory([FromRoute]int branchId, [FromRoute]int categoryId)
+        {
+            var products = await _productRepository.GetHardwareProductByCategory(branchId, categoryId);
+            return Ok(ConvertToJson(products));
+        }
+
+        private string ConvertToJson<T>(T obj)
+        {
+            var jsonObj = JsonConvert.SerializeObject(obj, new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            });
+            return jsonObj;
+
+        }
 
         [HttpGet]
         [Route("/api/product/get-product/{storeId}/{productId}")]

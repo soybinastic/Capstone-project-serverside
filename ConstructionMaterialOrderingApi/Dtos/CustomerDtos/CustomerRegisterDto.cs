@@ -15,7 +15,7 @@ namespace ConstructionMaterialOrderingApi.Dtos.CustomerDtos
         [Required(ErrorMessage = "Username is required")]
         public string UserName { get; set; }
         [Required(ErrorMessage = "Email is required")]
-        public string Email { get; set; }
+        public string Email { get; set; } = "customer@gmail.com";
         [Required(ErrorMessage = "Address is required")]
         public string Address { get; set; }
         [Required(ErrorMessage = "Contact number is required")]

@@ -14,5 +14,13 @@ namespace ConstructionMaterialOrderingApi.Dtos.OrderDtos
         public string Address { get; set; }
         public string ContactNo { get; set; }
         public string Email { get; set; }
+        public string Latitude { get; set; }
+        public string Longtitude { get; set; }
+        public string Nbi { get; set; }
+        public string BarangayClearance { get; set; }
+        public string GovernmentId { get; set; }
+        public string BankStatement { get; set; }
+        public int Age { get; set; }
+        public DateTime BirthDate { get; set; }
     }
 }

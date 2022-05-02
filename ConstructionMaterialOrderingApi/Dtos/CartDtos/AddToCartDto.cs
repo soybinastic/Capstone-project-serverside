@@ -11,6 +11,8 @@ namespace ConstructionMaterialOrderingApi.Dtos.CartDtos
         [Required]
         public int HardwareStoreId { get; set; }
         [Required]
+        public int BranchId { get; set; }
+        [Required]
         public int ProductId { get; set; }
         [Required]
         public int CategoryId { get; set; }

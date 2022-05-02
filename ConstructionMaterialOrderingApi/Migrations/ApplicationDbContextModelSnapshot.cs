@@ -93,6 +93,124 @@ namespace ConstructionMaterialOrderingApi.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.BestSellingDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("BestSellingDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("BestSellingReportId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BestSellingReportId");
+
+                    b.ToTable("BestSellingDetails");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.BestSellingProductReport", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("BestSellingDetailId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SaleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BestSellingDetailId");
+
+                    b.HasIndex("SaleId");
+
+                    b.ToTable("BestSellingProductReports");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.BestSellingReport", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("BestSellingReportType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateReported")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
+
+                    b.HasIndex("WarehouseId");
+
+                    b.ToTable("BestSellingReports");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.Branch", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("HardwareStoreId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Branches");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.BranchNotification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateNotified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BranchNotifications");
+                });
+
             modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.Cart", b =>
                 {
                     b.Property<int>("Id")
@@ -100,11 +218,17 @@ namespace ConstructionMaterialOrderingApi.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("BranchId")
+                        .HasColumnType("int");
+
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("DateAddedToCart")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("HardwareStoreId")
                         .HasColumnType("int");
@@ -153,6 +277,87 @@ namespace ConstructionMaterialOrderingApi.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.CompanyRegister", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BusinessPermitImageFile")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CompanyName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Country")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EmailAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Region")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RegisteredDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ZipCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CompanyRegisters");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.ConfirmedOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateConfirmed")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("HardwareStoreUserId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("HardwareStoreUserId");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("ConfirmedOrders");
+                });
+
             modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.Customer", b =>
                 {
                     b.Property<int>("Id")
@@ -166,6 +371,12 @@ namespace ConstructionMaterialOrderingApi.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Age")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("BirthDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("ContactNo")
                         .HasColumnType("nvarchar(max)");
 
@@ -175,7 +386,13 @@ namespace ConstructionMaterialOrderingApi.Migrations
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("bit");
+
                     b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MiddleName")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -203,6 +420,12 @@ namespace ConstructionMaterialOrderingApi.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Latitude")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Longtitude")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("OrderId")
@@ -327,6 +550,174 @@ namespace ConstructionMaterialOrderingApi.Migrations
                     b.ToTable("CustomerOrderProductHistories");
                 });
 
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.CustomerOrderRecieveImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImageFile")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CustomerOrderRecieveImages");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.CustomerVerification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Age")
+                        .HasColumnType("int");
+
+                    b.Property<string>("BankStatementImageFile")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BarangayClearanceImageFile")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("BirthDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateSubmitted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GovernmentIdImageFile")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MiddleName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NbiImageFile")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("CustomerVerifications");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.DeliverProduct", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WarehouseProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WarehouseReportId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
+
+                    b.HasIndex("WarehouseId");
+
+                    b.HasIndex("WarehouseProductId");
+
+                    b.ToTable("DeliverProducts");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.DepositSlip", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<double>("Amount")
+                        .HasColumnType("float");
+
+                    b.Property<string>("BankName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateDeposited")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Depositor")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
+
+                    b.ToTable("DepositSlips");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.HardwareProduct", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("CostPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("HardwareStoreId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImageFile")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Supplier")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("HardwareProducts");
+                });
+
             modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.HardwareStore", b =>
                 {
                     b.Property<int>("Id")
@@ -360,12 +751,101 @@ namespace ConstructionMaterialOrderingApi.Migrations
                     b.ToTable("HardwareStores");
                 });
 
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.HardwareStoreUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ApplicationUserAccountId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("HardwareStoreId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserFrom")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("HardwareStoreUsers");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.MoveProduct", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("FromWarehouseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("HardwareProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("HardwareStoreId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("MoveDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("MoveToWarehouseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HardwareProductId");
+
+                    b.ToTable("MoveProducts");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.NotificationNumber", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Number")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("NotificationNumbers");
+                });
+
             modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.Order", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("int");
 
                     b.Property<string>("CustomerEmail")
                         .HasColumnType("nvarchar(max)");
@@ -376,17 +856,29 @@ namespace ConstructionMaterialOrderingApi.Migrations
                     b.Property<string>("CustomerName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("DateConfirmed")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("Deliver")
                         .HasColumnType("bit");
 
                     b.Property<int>("HardwareStoreId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsCustomerOrderRecieved")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsOrderCanceled")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("Total")
                         .HasColumnType("float");
@@ -402,6 +894,9 @@ namespace ConstructionMaterialOrderingApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("int");
 
                     b.Property<int>("HardwareStoreId")
                         .HasColumnType("int");
@@ -421,6 +916,9 @@ namespace ConstructionMaterialOrderingApi.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("BranchId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Brand")
                         .HasColumnType("nvarchar(max)");
 
@@ -430,10 +928,19 @@ namespace ConstructionMaterialOrderingApi.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("HardwareProductId")
+                        .HasColumnType("int");
+
                     b.Property<int>("HardwareStoreId")
                         .HasColumnType("int");
 
+                    b.Property<string>("ImageFile")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsAvailable")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsAvailableInWarehouse")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
@@ -453,7 +960,287 @@ namespace ConstructionMaterialOrderingApi.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.TransportAgent", b =>
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.RecieveProduct", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<decimal>("CostPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("DateRecieve")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("HardwareProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalCost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("WarehouseReportId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HardwareProductId");
+
+                    b.HasIndex("WarehouseReportId");
+
+                    b.ToTable("RecieveProducts");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.Recipient", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("TotalAmount")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("Recipients");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.RecipientItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<double>("Amount")
+                        .HasColumnType("float");
+
+                    b.Property<int>("HardwareProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RecipientId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HardwareProductId");
+
+                    b.HasIndex("RecipientId");
+
+                    b.ToTable("RecipientItems");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.Request", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateRequest")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
+
+                    b.HasIndex("WarehouseId");
+
+                    b.ToTable("Requests");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.RequestProduct", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("HardwareProductId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsComplete")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RequestId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HardwareProductId");
+
+                    b.HasIndex("RequestId");
+
+                    b.ToTable("RequestProducts");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.Sale", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateSale")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("HardwareProductId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalSale")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
+
+                    b.HasIndex("HardwareProductId");
+
+                    b.ToTable("Sales");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.SaleItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ORNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("SaleItemDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double>("Total")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("SaleItems");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.SaleItemSummary", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<double>("Amount")
+                        .HasColumnType("float");
+
+                    b.Property<int>("HardwareProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SaleItemId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HardwareProductId");
+
+                    b.HasIndex("SaleItemId");
+
+                    b.ToTable("SaleItemSummaries");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.SaleReportDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateReported")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateSale")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SaleType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("TotalSales")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SaleReportDetails");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.StoreAdmin", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("AccountId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("HardwareStoreId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("StoreAdmins");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.SuperAdmin", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -471,7 +1258,207 @@ namespace ConstructionMaterialOrderingApi.Migrations
 
                     b.HasKey("Id");
 
+                    b.ToTable("SuperAdmins");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.TransportAgent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("AccountId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("HardwareStoreId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
                     b.ToTable("TransportAgents");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.Warehouse", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("HardwareStoreId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Warehouses");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.WarehouseAdmin", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("AccountId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("HardwareStoreId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WarehouseAdmins");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.WarehouseNotification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("DateNotified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WarehouseNotifications");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.WarehouseNotificationNumber", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("Number")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WarehouseNotificationNumbers");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.WarehouseProduct", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("AddedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("HardwareProductId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("StockNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HardwareProductId");
+
+                    b.ToTable("WarehouseProducts");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.WarehouseProductStatusReport", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("HardwareProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("StatusType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("WarehouseReportId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HardwareProductId");
+
+                    b.HasIndex("WarehouseReportId");
+
+                    b.ToTable("WarehouseProductStatusReports");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.WarehouseReport", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("DateReported")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("HardwareStoreId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReportType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WarehouseId");
+
+                    b.ToTable("WarehouseReports");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -605,6 +1592,348 @@ namespace ConstructionMaterialOrderingApi.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.BestSellingDetail", b =>
+                {
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.BestSellingReport", null)
+                        .WithMany("BestSellingDetails")
+                        .HasForeignKey("BestSellingReportId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.BestSellingProductReport", b =>
+                {
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.BestSellingDetail", null)
+                        .WithMany("BestSellingProductReports")
+                        .HasForeignKey("BestSellingDetailId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.Sale", "Sale")
+                        .WithMany()
+                        .HasForeignKey("SaleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Sale");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.BestSellingReport", b =>
+                {
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.Warehouse", "Warehouse")
+                        .WithMany()
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("Warehouse");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.ConfirmedOrder", b =>
+                {
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.HardwareStoreUser", "ConfirmedBy")
+                        .WithMany()
+                        .HasForeignKey("HardwareStoreUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ConfirmedBy");
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.CustomerVerification", b =>
+                {
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.DeliverProduct", b =>
+                {
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.Warehouse", "Warehouse")
+                        .WithMany()
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.WarehouseProduct", "WarehouseProduct")
+                        .WithMany()
+                        .HasForeignKey("WarehouseProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("Warehouse");
+
+                    b.Navigation("WarehouseProduct");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.DepositSlip", b =>
+                {
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Branch");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.HardwareProduct", b =>
+                {
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.MoveProduct", b =>
+                {
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.HardwareProduct", "Product")
+                        .WithMany()
+                        .HasForeignKey("HardwareProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.RecieveProduct", b =>
+                {
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.HardwareProduct", "HardwareProduct")
+                        .WithMany()
+                        .HasForeignKey("HardwareProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.WarehouseReport", "WarehouseReport")
+                        .WithMany()
+                        .HasForeignKey("WarehouseReportId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("HardwareProduct");
+
+                    b.Navigation("WarehouseReport");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.Recipient", b =>
+                {
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.RecipientItem", b =>
+                {
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.HardwareProduct", "HardwareProduct")
+                        .WithMany()
+                        .HasForeignKey("HardwareProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.Recipient", "Recipient")
+                        .WithMany("RecipientItems")
+                        .HasForeignKey("RecipientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("HardwareProduct");
+
+                    b.Navigation("Recipient");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.Request", b =>
+                {
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.Warehouse", "Warehouse")
+                        .WithMany()
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("Warehouse");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.RequestProduct", b =>
+                {
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.HardwareProduct", "HardwareProduct")
+                        .WithMany()
+                        .HasForeignKey("HardwareProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.Request", null)
+                        .WithMany("RequestProducts")
+                        .HasForeignKey("RequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("HardwareProduct");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.Sale", b =>
+                {
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.HardwareProduct", "HardwareProduct")
+                        .WithMany()
+                        .HasForeignKey("HardwareProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("HardwareProduct");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.SaleItem", b =>
+                {
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.SaleItemSummary", b =>
+                {
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.HardwareProduct", "HardwareProduct")
+                        .WithMany()
+                        .HasForeignKey("HardwareProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.SaleItem", "SaleItem")
+                        .WithMany("SaleItemSummaries")
+                        .HasForeignKey("SaleItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("HardwareProduct");
+
+                    b.Navigation("SaleItem");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.WarehouseProduct", b =>
+                {
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.HardwareProduct", "HardwareProduct")
+                        .WithMany()
+                        .HasForeignKey("HardwareProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("HardwareProduct");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.WarehouseProductStatusReport", b =>
+                {
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.HardwareProduct", "HardwareProduct")
+                        .WithMany()
+                        .HasForeignKey("HardwareProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.WarehouseReport", "WarehouseReport")
+                        .WithMany()
+                        .HasForeignKey("WarehouseReportId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("HardwareProduct");
+
+                    b.Navigation("WarehouseReport");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.WarehouseReport", b =>
+                {
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.Warehouse", "Warehouse")
+                        .WithMany()
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Warehouse");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -654,6 +1983,31 @@ namespace ConstructionMaterialOrderingApi.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.BestSellingDetail", b =>
+                {
+                    b.Navigation("BestSellingProductReports");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.BestSellingReport", b =>
+                {
+                    b.Navigation("BestSellingDetails");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.Recipient", b =>
+                {
+                    b.Navigation("RecipientItems");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.Request", b =>
+                {
+                    b.Navigation("RequestProducts");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.SaleItem", b =>
+                {
+                    b.Navigation("SaleItemSummaries");
                 });
 #pragma warning restore 612, 618
         }

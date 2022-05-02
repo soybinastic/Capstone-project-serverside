@@ -1,22 +1,26 @@
 using ConstructionMaterialOrderingApi.Context;
 using ConstructionMaterialOrderingApi.Hubs;
+using ConstructionMaterialOrderingApi.Implementations;
 using ConstructionMaterialOrderingApi.Models;
 using ConstructionMaterialOrderingApi.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -69,11 +73,20 @@ namespace ConstructionMaterialOrderingApi
                 };
             });
 
-            services.AddCors(option => option.AddDefaultPolicy(builder =>
-                builder.WithOrigins("http://localhost:4200")
+            //services.AddCors(option => option.AddDefaultPolicy(builder =>
+            //    builder.WithOrigins("http://localhost:4200")
+            //            .AllowAnyMethod()
+            //            .AllowAnyHeader()
+            //            .AllowCredentials())); 
+            
+            services.AddCors(options => 
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder.SetIsOriginAllowed(_ => true)
                         .AllowAnyMethod()
                         .AllowAnyHeader()
-                        .AllowCredentials())); 
+                        .AllowCredentials());
+            });
             
             services.AddControllers().AddJsonOptions(option =>
                 option.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
@@ -81,13 +94,8 @@ namespace ConstructionMaterialOrderingApi
 
             services.AddSignalR();
 
-            services.AddTransient<IHardwareStoreRepository, HardwareStoreRepository>();
-            services.AddTransient<ICustomerRepository, CustomerRepository>();
-            services.AddTransient<IProductRepository, ProductRepository>();
-            services.AddTransient<ICategoryRepository, CategoryRepository>();
-            services.AddTransient<ICartRepository, CartRepository>();
-            services.AddTransient<IOrderRepository, OrderRepository>();
-            services.AddTransient<ITransportAgentRepository, TransportAgentRepository>();
+            //configuring all my repositories
+            services.ConfigureRepositories();
 
             services.AddSwaggerGen(c =>
             {
@@ -108,7 +116,15 @@ namespace ConstructionMaterialOrderingApi
             app.UseHttpsRedirection();
 
             app.UseRouting();
-            app.UseCors();
+            app.UseCors("CorsPolicy");
+            app.UseStaticFiles();
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"Resources")),
+                RequestPath = new PathString("/Resources")
+            });
+
             app.UseAuthentication();
             app.UseAuthorization();
 

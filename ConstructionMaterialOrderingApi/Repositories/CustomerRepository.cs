@@ -32,9 +32,13 @@ namespace ConstructionMaterialOrderingApi.Repositories
                     AccountId = customer.AccountId,
                     FirstName = customer.FirstName,
                     LastName = customer.LastName,
+                    MiddleName = customer.MiddleName,
                     Address = customer.Address,
                     ContactNo = customer.ContactNo,
-                    Email = customer.Email
+                    Email = customer.Email,
+                    Age = customer.Age,
+                    BirthDate = customer.BirthDate,
+                    IsVerified = customer.IsVerified
                 };
                 return customerDto;
             }
@@ -49,13 +53,38 @@ namespace ConstructionMaterialOrderingApi.Repositories
                 AccountId = accountId,
                 FirstName = model.FirstName,
                 LastName = model.LastName,
+                MiddleName = "",
                 Email = model.Email,
                 Address = model.Address,
-                ContactNo = model.ContactNo
+                ContactNo = model.ContactNo,
+                Age = 0,
+                BirthDate = DateTime.MinValue,
+                IsVerified = false
             };
 
             await _context.Customers.AddAsync(customer);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> Update(UpdateCustomerDto customerDto, string accountId)
+        {
+            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.AccountId == accountId);
+            if(customer != null)
+            {
+                customer.FirstName = customerDto.FirstName;
+                customer.LastName = customerDto.LastName;
+                customer.MiddleName = customerDto.MiddleName;
+                customer.Address = customerDto.Address;
+                customer.ContactNo = customerDto.ContactNo;
+                customer.Age = customerDto.Age;
+                customer.BirthDate = customerDto.BirthDate;
+
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+
+            return false;
         }
     }
 }

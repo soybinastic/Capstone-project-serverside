@@ -50,7 +50,7 @@ namespace ConstructionMaterialOrderingApi.Controllers
 
         [HttpPost]
         [Route("/api/account/logout")] 
-        [Authorize(Roles = "Admin,StoreOwner,Customer,TransportAgent")]
+        [Authorize]
         public async Task<IActionResult> LogOut()
         {
             var accountId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);

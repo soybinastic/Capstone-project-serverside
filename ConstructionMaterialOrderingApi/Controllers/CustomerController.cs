@@ -45,7 +45,7 @@ namespace ConstructionMaterialOrderingApi.Controllers
             var customerUser = new ApplicationUser()
             {
                 UserName = model.UserName,
-                Email = model.Email,
+                Email = "customer@gmail.com",
                 FirstName = model.FirstName,
                 LastName = model.LastName, 
                 RegisteredDate = DateTime.Now
@@ -62,7 +62,17 @@ namespace ConstructionMaterialOrderingApi.Controllers
 
             return BadRequest(new { Success = 0, Message = "Something went wrong."});
 
-        } 
+        }
+        
+        [HttpPut]
+        [Route("update")]
+        [Authorize(Roles = "Customer")]
+        public async Task<IActionResult> Update([FromBody]UpdateCustomerDto customerDto)
+        {
+            var userAppId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var result = await _cutomerRepository.Update(customerDto, userAppId);
+            return result ? Ok(new { Success = 1, Message = "Personal Information Successfully updated."}) : BadRequest(new { Success = 0, Message = "Failed to update."});
+        }
 
         [HttpGet]
         [Route("/api/customer/get-customer-info")]

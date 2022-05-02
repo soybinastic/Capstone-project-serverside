@@ -22,7 +22,7 @@ namespace ConstructionMaterialOrderingApi.Repositories
             _context = context;
             _hubContext = hubContext;
         }
-        public void AddHardwareStore(string accountId, RegisterHardwareStoreDto model)
+        public HardwareStore AddHardwareStore(string accountId, RegisterHardwareStoreDto model)
         {
             var hardwareStore = new HardwareStore()
             {
@@ -38,15 +38,16 @@ namespace ConstructionMaterialOrderingApi.Repositories
             _context.SaveChanges();
 
             //find hardware store after added to database to get hardwareId to store it to order notification entity.
-            var hardware = _context.HardwareStores.Where(h => h.AccountId == accountId).FirstOrDefault();
+            //var hardware = _context.HardwareStores.Where(h => h.AccountId == accountId).FirstOrDefault();
 
-            var orderNotification = new OrderNotificationNumber()
-            {
-                HardwareStoreId = hardware.Id,
-                NumberOfOrder = 0
-            };
-            _context.OrderNotificationNumbers.Add(orderNotification);
-            _context.SaveChanges();
+            //var orderNotification = new OrderNotificationNumber()
+            //{
+            //    HardwareStoreId = hardware.Id,
+            //    NumberOfOrder = 0
+            //};
+            //_context.OrderNotificationNumbers.Add(orderNotification);
+            //_context.SaveChanges();
+            return hardwareStore;
         }
 
         public async Task<List<GetAllHardwareStoreDto>> GetAllHardwareStore()

@@ -1,4 +1,5 @@
 ﻿using ConstructionMaterialOrderingApi.Dtos.AdminDtos;
+using ConstructionMaterialOrderingApi.Dtos.HardwareStoreUserDto;
 using ConstructionMaterialOrderingApi.Models;
 using ConstructionMaterialOrderingApi.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -19,13 +20,15 @@ namespace ConstructionMaterialOrderingApi.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IHardwareStoreRepository _hardwareStoreRepository;
+        private readonly IHardwareStoreUserRepository _hardwareStoreUserRepository;
 
         public AdminController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager,
-            IHardwareStoreRepository hardwareStoreRepository)
+            IHardwareStoreRepository hardwareStoreRepository, IHardwareStoreUserRepository hardwareStoreUserRepository)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _hardwareStoreRepository = hardwareStoreRepository;
+            _hardwareStoreUserRepository = hardwareStoreUserRepository;
         } 
         [HttpPost]
         [Route("/api/admin/add-role")]
@@ -104,9 +107,19 @@ namespace ConstructionMaterialOrderingApi.Controllers
             var result = await _userManager.CreateAsync(hardwareAccount, model.Password);
             if (result.Succeeded)
             {
+                var storeOwnerUser = new HardwareStoreUserDto()
+                {
+                    FirstName = hardwareAccount.FirstName,
+                    LastName = hardwareAccount.LastName,
+                    Email = hardwareAccount.Email,
+                    UserName = hardwareAccount.UserName,
+                    Role = "StoreOwner",
+                    UserFrom = "Store"
+                };
                 var user = await _userManager.FindByNameAsync(model.UserName);
                 await _userManager.AddToRoleAsync(user, role);
-                _hardwareStoreRepository.AddHardwareStore(user.Id, model);
+                var hardwareStore = _hardwareStoreRepository.AddHardwareStore(user.Id, model);
+                await _hardwareStoreUserRepository.AddUser(storeOwnerUser, user.Id, hardwareStore.Id);
                 return Ok(new { Success = 1, Message = $"{model.HardwareStoreName} is registered successfully."});
             }
 

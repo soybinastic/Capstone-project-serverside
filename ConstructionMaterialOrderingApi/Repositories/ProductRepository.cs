@@ -20,6 +20,90 @@ namespace ConstructionMaterialOrderingApi.Repositories
             _harwareStoreRepo = hardwareStoreRepository;
             _context = context;
         }
+        public async Task<bool> CreateHardwareProduct(int hardwareStoreId, HardwareProduct hardwareProduct, int quantity, int branchId)
+        {
+            var isExist = await _context.Products.Where(p => p.BranchId == branchId && p.HardwareProductId == hardwareProduct.Id)
+                .AnyAsync();
+            if (!isExist)
+            {
+                var product = new Product()
+                {
+                    HardwareProductId = hardwareProduct.Id,
+                    BranchId = branchId,
+                    CategoryId = hardwareProduct.CategoryId,
+                    HardwareStoreId = hardwareStoreId,
+                    Name = hardwareProduct.Name,
+                    Description = hardwareProduct.Description,
+                    Brand = "None",
+                    Quality = "None",
+                    Price = (double)hardwareProduct.CostPrice,
+                    StockNumber = quantity,
+                    IsAvailable = IsAvailableProduct(quantity),
+                    IsAvailableInWarehouse = false
+                };
+
+                await _context.Products.AddAsync(product);
+                _context.SaveChanges();
+                return true;
+            }
+
+            return false;
+            
+        } 
+        public async Task<Product> GetHardwareProduct(int branchId, int hardwareProductId)
+        {
+            var product = await _context.Products.Where(p => p.BranchId == branchId && p.HardwareProductId == hardwareProductId)
+                .FirstOrDefaultAsync();
+
+            return product;
+        }
+
+        public async Task<List<Product>> GetHardwareProducts(int branchId)
+        {
+            var products = await _context.Products.Where(p => p.BranchId == branchId)
+                .ToListAsync();
+            return products;
+        }
+        public async Task<List<Product>> GetHardwareProductByCategory(int branchId, int categoryId)
+        {
+            var products = await _context.Products.Where(p => p.BranchId == branchId && p.CategoryId == categoryId)
+                .ToListAsync();
+
+            return products;
+        }
+
+        public async Task<bool> UpdateHardwareProduct(UpdateHardwareProductDto hardwareProductDto, int branchId, int hardwareProductId)
+        {
+            var isExist = await _context.Products.Where(p => p.BranchId == branchId && p.HardwareProductId == hardwareProductId)
+                .AnyAsync();
+
+            if (isExist)
+            {
+                var productToUpdate = await _context.Products.Where(p => p.BranchId == branchId && p.HardwareProductId == hardwareProductId)
+                .FirstOrDefaultAsync();
+                productToUpdate.Brand = hardwareProductDto.Brand;
+                productToUpdate.Quality = hardwareProductDto.Quality;
+
+                await _context.SaveChangesAsync();
+                return true;
+            }
+
+            return false;
+        }
+        public async Task UpdateQuantity(int branchId, int hardwareProductId, int quantity)
+        {
+            var isExist = await _context.Products.Where(p => p.BranchId == branchId && p.HardwareProductId == hardwareProductId)
+                .AnyAsync();
+
+            if (isExist)
+            {
+                var productToUpdate = await _context.Products.Where(p => p.BranchId == branchId && p.HardwareProductId == hardwareProductId)
+                .FirstOrDefaultAsync();
+                productToUpdate.StockNumber = quantity;
+
+                await _context.SaveChangesAsync();
+            }
+        }
         public async Task<bool> CreateProduct(int hardwareStoreId, CreateProductDto model)
         {
             TextInfo text = new CultureInfo("en-US", false).TextInfo;

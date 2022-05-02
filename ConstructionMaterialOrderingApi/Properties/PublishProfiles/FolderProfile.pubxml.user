@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <History>True|2022-03-12T02:44:12.1253848Z;True|2022-03-12T10:24:40.4220915+08:00;True|2022-03-12T09:03:19.4303890+08:00;True|2022-03-12T08:18:20.7791680+08:00;True|2022-03-11T21:51:03.1847168+08:00;False|2022-03-11T21:45:05.7151514+08:00;</History>
+    <_PublishTargetUrl>C:\Users\bisoyvinuya\source\repos\CapstoneProject\ConstructionMaterialOrderingApi\bin\Release\net5.0\publish\</_PublishTargetUrl>
+  </PropertyGroup>
+</Project>
