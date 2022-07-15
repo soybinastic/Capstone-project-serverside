@@ -18,6 +18,8 @@ using System.IO;
 using Microsoft.EntityFrameworkCore;
 using Syncfusion.Pdf.Grid;
 using ConstructionMaterialOrderingApi.Models;
+using System.Data;
+using System.Text;
 
 namespace ConstructionMaterialOrderingApi.Controllers
 {
@@ -45,32 +47,141 @@ namespace ConstructionMaterialOrderingApi.Controllers
             _db = db;
         } 
         // endpoint to be fix soon.
-        [HttpPost]
+        [HttpGet]
         [Route("download/{id}")]
-        [Authorize(Roles = "StoreAdmin")]
-        public async Task<IActionResult> Download([FromRoute]int id)
+        // [Authorize(Roles = "StoreAdmin")]
+        public async Task<IActionResult> Download([FromRoute]int id, [FromQuery]string order_ref)
         {
             var recipient = await _db.Recipients.Where(r => r.Id == id)
                 .Include(r => r.RecipientItems)
+                .ThenInclude(r => r.HardwareProduct)
+                .Include(r => r.Branch)
+                .Include(r => r.Customer)
+                .Include(r => r.Order)
                 .FirstOrDefaultAsync();
-            PdfDocument doc = new PdfDocument();
-            PdfPage page = doc.Pages.Add();
-            PdfGraphics g = page.Graphics;
-            PdfFont font = new PdfStandardFont(PdfFontFamily.Helvetica, 20);
+            // PdfDocument doc = new PdfDocument();
+            // PdfPage page = doc.Pages.Add();
+            // PdfGraphics g = page.Graphics;
+            // PdfFont font = new PdfStandardFont(PdfFontFamily.Helvetica, 20);
+            // PdfGrid pdfGrid = new PdfGrid();
+
+            // g.DrawString("Order Reference", font, PdfBrushes.Black, new PointF(0, 0));
+            // pdfGrid.DataSource = recipient.RecipientItems;
+            // pdfGrid.Draw(page, new Syncfusion.Drawing.PointF(10, 10));
+
+            // MemoryStream stream = new MemoryStream();
+            // doc.Save(stream);
+            // stream.Position = 0;
+            // doc.Close(true);
+
+            // var file = File(stream, "application/pdf", "order_ref.pdf");
+
+            //return Ok(); 
+            var folder = Path.Combine("Resources", "OrderRefsPdf");
+            var fullPath = Path.Combine(Directory.GetCurrentDirectory(), folder);
+            var fileName = GenerateRandomFileName();
+            var pathToSave = Path.Combine(fullPath, fileName);
+
+            using var document = new PdfDocument();
+            document.PageSettings.Orientation = PdfPageOrientation.Landscape;
+            document.PageSettings.Margins.All = 50;
+
+            PdfPage page = document.Pages.Add();
             PdfGrid pdfGrid = new PdfGrid();
 
-            g.DrawString("Order Reference", font, PdfBrushes.Black, new PointF(0, 0));
-            pdfGrid.DataSource = recipient.RecipientItems;
+            // DataTable table = new DataTable();
+            // table.Columns.Add("Item Name");
+            // table.Columns.Add("Price");
+            // table.Columns.Add("Quantity");
+            // table.Columns.Add("Total");
+            // table.Rows.Add(new string[] { "Item Name", "Price", "Quantity", "Total" });
+            // foreach (var item in items)
+            // {
+            //     table.Rows.Add(new object[] { item.ItemName, item.Price.ToString(), item.Quantity.ToString(), item.Total.ToString() });
+            // }
+
+            // pdfGrid.DataSource = table;
             pdfGrid.Draw(page, new Syncfusion.Drawing.PointF(10, 10));
+            PdfFont font = new PdfStandardFont(PdfFontFamily.Helvetica, 19, PdfFontStyle.Bold);
 
-            MemoryStream stream = new MemoryStream();
-            doc.Save(stream);
-            stream.Position = 0;
-            doc.Close(true);
+            page.Graphics.DrawString("Fastline Hardware", font, PdfBrushes.Black, new Syncfusion.Drawing.PointF(186, 0));
 
-            var file = File(stream, "application/pdf", "order_ref.pdf");
+            PdfLayoutResult layoutResult = new PdfLayoutResult(page, new Syncfusion.Drawing.RectangleF(0, 0, page.Graphics.ClientSize.Width / 2, 95));
+            font = new PdfStandardFont(PdfFontFamily.TimesRoman, 14);
 
-            return Ok(file);
+            PdfGraphics g = page.Graphics;
+            g.DrawRectangle(new PdfSolidBrush(new PdfColor(126, 151, 173)), new Syncfusion.Drawing.RectangleF(0, layoutResult.Bounds.Bottom + 40, g.ClientSize.Width, 30));
+
+            PdfTextElement element = new PdfTextElement($"ORDER REF. NO. : {order_ref}", font);
+            element.Brush = PdfBrushes.White;
+            layoutResult = element.Draw(page, new Syncfusion.Drawing.PointF(10, layoutResult.Bounds.Bottom + 48));
+            string date = "ORDER DATE: " + recipient.Order.OrderDate.ToString("MM/dd/yyyy");
+            Syncfusion.Drawing.SizeF dateText = font.MeasureString(date);
+            g.DrawString(date, font, element.Brush, new Syncfusion.Drawing.PointF(g.ClientSize.Width - dateText.Width - 10, layoutResult.Bounds.Y));
+
+            element = new PdfTextElement("BILL TO ", new PdfStandardFont(PdfFontFamily.TimesRoman, 10));
+            element.Brush = new PdfSolidBrush(new PdfColor(126, 155, 203));
+            layoutResult = element.Draw(page, new Syncfusion.Drawing.PointF(10, layoutResult.Bounds.Bottom + 25));
+
+            var strBuilder = new StringBuilder();
+            strBuilder.Append(recipient.Branch.Name).Append(", ").Append(recipient.Branch.Address).AppendLine();
+            strBuilder.Append(recipient.Customer.FirstName).Append(", ").Append(recipient.Customer.LastName).AppendLine();
+
+            element = new PdfTextElement(strBuilder.ToString(), new PdfStandardFont(PdfFontFamily.TimesRoman, 10));
+            element.Brush = new PdfSolidBrush(new PdfColor(89, 89, 93));
+            layoutResult = element.Draw(page, new Syncfusion.Drawing.RectangleF(10, layoutResult.Bounds.Bottom + 3, g.ClientSize.Width / 2, 100));
+
+            g.DrawLine(new PdfPen(new PdfColor(126, 151, 173), 0.70f), new Syncfusion.Drawing.PointF(0, layoutResult.Bounds.Bottom + 3), new Syncfusion.Drawing.PointF(g.ClientSize.Width, layoutResult.Bounds.Bottom + 3));
+
+            DataTable table = new DataTable();
+            table.Columns.Add("Item Name");
+            table.Columns.Add("Price");
+            table.Columns.Add("Quantity");
+            table.Columns.Add("Total");
+            // table.Rows.Add(new string[] { "Item Name", "Price", "Quantity", "Total" });
+            foreach (var item in recipient.RecipientItems)
+            {
+                table.Rows.Add(new object[] { item.HardwareProduct.Name, item.HardwareProduct.CostPrice.ToString(), (item.Amount / (double)item.HardwareProduct.CostPrice).ToString(), item.Amount });
+            }
+            table.Rows.Add(new object[] { "", "", "", "Total of : " + recipient.TotalAmount });
+
+            pdfGrid.DataSource = table;
+
+            PdfGridCellStyle cellStyle = new PdfGridCellStyle();
+            cellStyle.Borders.All = PdfPens.White;
+            PdfGridRow header = pdfGrid.Headers[0];
+
+            PdfGridCellStyle headerCellStyle = new PdfGridCellStyle();
+            headerCellStyle.Borders.All = new PdfPen(new PdfColor(126, 151, 173));
+            headerCellStyle.BackgroundBrush = new PdfSolidBrush(new PdfColor(126, 151, 173));
+            headerCellStyle.TextBrush = PdfBrushes.White;
+            headerCellStyle.Font = new PdfStandardFont(PdfFontFamily.TimesRoman, 14f, PdfFontStyle.Regular);
+
+            header.ApplyStyle(headerCellStyle);
+            cellStyle.Borders.Bottom = new PdfPen(new PdfColor(217, 217, 217), 0.70f);
+            cellStyle.Font = new PdfStandardFont(PdfFontFamily.TimesRoman, 12f);
+            cellStyle.TextBrush = new PdfSolidBrush(new PdfColor(131, 130, 136));
+            //Creates the layout format for grid
+            PdfGridLayoutFormat layoutFormat = new PdfGridLayoutFormat();
+            // Creates layout format settings to allow the table pagination
+            layoutFormat.Layout = PdfLayoutType.Paginate;
+            //Draws the grid to the PDF page.
+            PdfGridLayoutResult gridResult = pdfGrid.Draw(page, new Syncfusion.Drawing.RectangleF(new Syncfusion.Drawing.PointF(0, layoutResult.Bounds.Bottom + 40), new Syncfusion.Drawing.SizeF(g.ClientSize.Width, g.ClientSize.Height - 100)), layoutFormat);
+
+            if(!Directory.Exists(fullPath))
+            {
+                Directory.CreateDirectory(fullPath);
+            }
+
+            FileStream stream = new FileStream(pathToSave, FileMode.Create);
+            document.Save(stream);
+            stream.Close();
+
+            document.Close(true);
+
+            FileStream retrieveFileStream = new FileStream(pathToSave, FileMode.Open);
+
+            return File(retrieveFileStream, "application/octet-stream", "foh_recipient.pdf");
         }
 
        
@@ -206,6 +317,15 @@ namespace ConstructionMaterialOrderingApi.Controllers
             });
 
             return jsonObj;
+        }
+
+        private string GenerateRandomFileName()
+        {
+            string year = DateTime.Now.Year.ToString();
+            string month = DateTime.Now.Month.ToString();
+            string day = DateTime.Now.Day.ToString();
+            string time = $"{DateTime.Now.Hour.ToString()}{DateTime.Now.Minute.ToString()}{DateTime.Now.Second.ToString()}{DateTime.Now.Millisecond.ToString()}";
+            return $"{year}{month}{day}{time}_fastonline_or.pdf";
         }
     }
 }
