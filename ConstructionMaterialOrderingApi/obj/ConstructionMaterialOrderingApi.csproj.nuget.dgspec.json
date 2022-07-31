@@ -1,30 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\bisoyvinuya\\source\\repos\\CapstoneProject\\ConstructionMaterialOrderingApi\\ConstructionMaterialOrderingApi.csproj": {}
+    "C:\\Users\\Cristian Rec Aboc\\capstone_projects\\Capstone-project-serverside\\ConstructionMaterialOrderingApi\\ConstructionMaterialOrderingApi.csproj": {}
   },
   "projects": {
-    "C:\\Users\\bisoyvinuya\\source\\repos\\CapstoneProject\\ConstructionMaterialOrderingApi\\ConstructionMaterialOrderingApi.csproj": {
+    "C:\\Users\\Cristian Rec Aboc\\capstone_projects\\Capstone-project-serverside\\ConstructionMaterialOrderingApi\\ConstructionMaterialOrderingApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\bisoyvinuya\\source\\repos\\CapstoneProject\\ConstructionMaterialOrderingApi\\ConstructionMaterialOrderingApi.csproj",
+        "projectUniqueName": "C:\\Users\\Cristian Rec Aboc\\capstone_projects\\Capstone-project-serverside\\ConstructionMaterialOrderingApi\\ConstructionMaterialOrderingApi.csproj",
         "projectName": "ConstructionMaterialOrderingApi",
-        "projectPath": "C:\\Users\\bisoyvinuya\\source\\repos\\CapstoneProject\\ConstructionMaterialOrderingApi\\ConstructionMaterialOrderingApi.csproj",
-        "packagesPath": "C:\\Users\\bisoyvinuya\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\bisoyvinuya\\source\\repos\\CapstoneProject\\ConstructionMaterialOrderingApi\\obj\\",
+        "projectPath": "C:\\Users\\Cristian Rec Aboc\\capstone_projects\\Capstone-project-serverside\\ConstructionMaterialOrderingApi\\ConstructionMaterialOrderingApi.csproj",
+        "packagesPath": "C:\\Users\\Cristian Rec Aboc\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Cristian Rec Aboc\\capstone_projects\\Capstone-project-serverside\\ConstructionMaterialOrderingApi\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
         "configFilePaths": [
-          "C:\\Users\\bisoyvinuya\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\Cristian Rec Aboc\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net5.0"
         ],
         "sources": {
-          "C:\\EFCore": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -96,12 +91,6 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[5.0.16, 5.0.16]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -110,7 +99,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.202\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.302\\RuntimeIdentifierGraph.json"
         }
       }
     }

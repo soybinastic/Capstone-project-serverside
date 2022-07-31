@@ -14,6 +14,9 @@ namespace ConstructionMaterialOrderingApi.Repositories
 {
     public class CompanyRegisterRepository : ICompanyRegisterRepository
     {
+        private const string BUSINESS_PERMIT_PATH = "BusinessPermitFiles";
+        private const string DTI_PATH = "DTIImageFiles";
+        private const string BIR_PATH = "BIRImageFiles";
         private readonly ApplicationDbContext _context;
         public CompanyRegisterRepository(ApplicationDbContext context)
         {
@@ -33,7 +36,9 @@ namespace ConstructionMaterialOrderingApi.Repositories
                 Country = registerDto.Country,
                 PhoneNumber = registerDto.PhoneNumber,
                 EmailAddress = registerDto.EmailAddress,
-                BusinessPermitImageFile = await UploadBusinessPermitFile(registerDto.BusinessPermitImageFile),
+                BusinessPermitImageFile = await UploadRequirementsFile(registerDto.BusinessPermitImageFile, BUSINESS_PERMIT_PATH),
+                DTIImageFile = await UploadRequirementsFile(registerDto.DtiImageFile, DTI_PATH),
+                BIRImageFile = await UploadRequirementsFile(registerDto.BirImageFile, BIR_PATH),
                 RegisteredDate = DateTime.Now
             };
 
@@ -66,11 +71,11 @@ namespace ConstructionMaterialOrderingApi.Repositories
             return companyRegisters;
         }
 
-        private async Task<string> UploadBusinessPermitFile(IFormFile file)
+        private async Task<string> UploadRequirementsFile(IFormFile file, string folderNamePath)
         {
             try
             {
-                var folderName = Path.Combine("Resources", "BusinessPermitFiles");
+                var folderName = Path.Combine("Resources", folderNamePath);
                 var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
 
                 if (!Directory.Exists(pathToSave))

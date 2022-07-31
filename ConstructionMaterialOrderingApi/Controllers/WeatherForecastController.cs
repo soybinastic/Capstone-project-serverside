@@ -26,6 +26,8 @@ namespace ConstructionMaterialOrderingApi.Controllers
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
+            
+            Console.WriteLine("invokeddd!!!!!");
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {

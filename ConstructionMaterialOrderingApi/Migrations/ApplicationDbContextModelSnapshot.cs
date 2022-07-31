@@ -287,6 +287,9 @@ namespace ConstructionMaterialOrderingApi.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("BIRImageFile")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("BusinessPermitImageFile")
                         .HasColumnType("nvarchar(max)");
 
@@ -294,6 +297,9 @@ namespace ConstructionMaterialOrderingApi.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Country")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DTIImageFile")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EmailAddress")

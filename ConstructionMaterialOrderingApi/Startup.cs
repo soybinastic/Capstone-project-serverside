@@ -119,11 +119,12 @@ namespace ConstructionMaterialOrderingApi
             app.UseCors("CorsPolicy");
             app.UseStaticFiles();
 
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"Resources")),
-                RequestPath = new PathString("/Resources")
-            });
+            // temporary comment this code for deployment reason.
+            // app.UseStaticFiles(new StaticFileOptions
+            // {
+            //     FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"Resources")),
+            //     RequestPath = new PathString("/Resources")
+            // });
 
             app.UseAuthentication();
             app.UseAuthorization();

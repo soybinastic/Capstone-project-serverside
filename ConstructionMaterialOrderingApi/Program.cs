@@ -21,6 +21,7 @@ namespace ConstructionMaterialOrderingApi
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                    webBuilder.UseIIS();
                 });
     }
 }

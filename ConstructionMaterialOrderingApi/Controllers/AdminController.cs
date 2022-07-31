@@ -50,7 +50,7 @@ namespace ConstructionMaterialOrderingApi.Controllers
         } 
         [HttpPost]
         [Route("/api/admin/add-admin")]
-        [Authorize(Roles = "Admin")]
+        // [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddAdmin([FromBody] AddAdminDto addAdminDto)
         {
             string role = "Admin";

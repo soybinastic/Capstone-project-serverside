@@ -29,5 +29,9 @@ namespace ConstructionMaterialOrderingApi.Dtos.CompanyRegisterDtos
         public string EmailAddress { get; set; }
         [Required]
         public IFormFile BusinessPermitImageFile { get; set; }
+        [Required]
+        public IFormFile DtiImageFile { get; set; }
+        [Required]
+        public IFormFile BirImageFile { get; set; }
     }
 }

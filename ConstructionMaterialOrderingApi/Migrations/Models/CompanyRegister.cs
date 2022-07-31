@@ -18,6 +18,8 @@ namespace ConstructionMaterialOrderingApi.Models
         public string PhoneNumber { get; set; }
         public string EmailAddress { get; set; }
         public string BusinessPermitImageFile { get; set; }
+        public string DTIImageFile { get; set; }
+        public string BIRImageFile { get; set; }
         public DateTime RegisteredDate { get; set; }
     }
 }
