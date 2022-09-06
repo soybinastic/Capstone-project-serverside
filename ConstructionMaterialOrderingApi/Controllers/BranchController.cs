@@ -1,4 +1,5 @@
 ﻿using ConstructionMaterialOrderingApi.Dtos.BranchDto;
+using ConstructionMaterialOrderingApi.Helpers;
 using ConstructionMaterialOrderingApi.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -53,6 +54,7 @@ namespace ConstructionMaterialOrderingApi.Controllers
         {
             var branches = await _branchRepository.GetActiveBranches(storeId);
             var json = ConvertToJson(branches);
+            // Console.WriteLine(HttpContext.User.Identity.IsAuthenticated);
             return Ok(json);
         }
 
@@ -77,6 +79,33 @@ namespace ConstructionMaterialOrderingApi.Controllers
             IActionResult returnValue = result ? Ok(new { Success = 1, Message = "Modified Successfully" }) :
                 BadRequest(new { Success = 0, Message = "Failed to update" });
             return returnValue;
+        }
+        [HttpGet("all-branches")]
+        public async Task<IActionResult> GetAllBranches()
+        {
+            try
+            {
+                string customerLat = HttpContext.Request.Headers["lat"];
+                string customerLng = HttpContext.Request.Headers["lng"];
+
+                double lat = customerLat.ToLatLng();
+                double lng = customerLng.ToLatLng();
+                Console.WriteLine($"Lat: {lat} Lng: {lng}");
+
+                var allBranches = await _branchRepository.GetAllBranches(lat, lng);
+                // Console.WriteLine(HttpContext.User.Identity.IsAuthenticated);
+                return Ok(ConvertToJson(allBranches));
+
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("search")]
+        public async Task<IActionResult> Search([FromQuery(Name = "search")]string branchName)
+        {
+            var foundBranches = await _branchRepository.Search(branchName);
+            return Ok(ConvertToJson(foundBranches));
         }
         private string ConvertToJson<T>(T val)
         {

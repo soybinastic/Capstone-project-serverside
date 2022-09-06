@@ -124,6 +124,7 @@ namespace ConstructionMaterialOrderingApi.Repositories
             && sale.DateSale.Month == DateTime.Now.Month
             && sale.DateSale.Day == DateTime.Now.Day)
                 .SumAsync(sale => sale.TotalSale);
+            Console.WriteLine(DateTime.Now);
             return totalSales;
         }
 

@@ -193,6 +193,7 @@ namespace ConstructionMaterialOrderingApi.Controllers
             var userAppId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var storeAdmin = await _storeAdminRepository.GetStoreAdminByAccountId(userAppId);
             var todaySales = await _saleRepository.GetTodaySales(storeAdmin.BranchId);
+            Console.WriteLine(todaySales);
             return Ok(ConvertToJson(todaySales));
         } 
 

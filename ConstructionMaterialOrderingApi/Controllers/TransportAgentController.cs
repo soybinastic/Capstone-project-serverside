@@ -1,4 +1,5 @@
 ﻿using ConstructionMaterialOrderingApi.Dtos.TransportAgentDtos;
+using ConstructionMaterialOrderingApi.Helpers;
 using ConstructionMaterialOrderingApi.Models;
 using ConstructionMaterialOrderingApi.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -36,7 +37,7 @@ namespace ConstructionMaterialOrderingApi.Controllers
         [Authorize(Roles = "StoreOwner")]
         public async Task<IActionResult> AddTransportAgent([FromBody] CreateTransportAgentDto model)
         {
-            string role = "TransportAgent";
+            string role = UserRole.TRANSPORT_AGENT;
 
             var hardwareStoreUserAccountId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var hardwareStore = await _hardwareStoreRepository.GetHardware(hardwareStoreUserAccountId);
@@ -48,7 +49,9 @@ namespace ConstructionMaterialOrderingApi.Controllers
             }
 
             if (!await _roleManager.RoleExistsAsync(role))
-                return BadRequest(new { Success = 0, Message = "Role is not exist" });
+            {
+                await _roleManager.CreateAsync(new IdentityRole { Name = role });
+            }  
 
             var storeTransportAgentUser = new ApplicationUser()
             {

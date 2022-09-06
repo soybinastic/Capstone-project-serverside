@@ -10,6 +10,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Firebase.Storage;
 using System.IO;
+using ConstructionMaterialOrderingApi.Helpers;
+using Microsoft.Extensions.Options;
 
 namespace ConstructionMaterialOrderingApi.Repositories
 {
@@ -20,28 +22,34 @@ namespace ConstructionMaterialOrderingApi.Repositories
         private readonly IWarehouseProductRepository _warehouseProductRepository;
         private readonly IWarehouseRepository _warehouseRepository;
         private readonly IBranchRepository _branchRepository;
+        private readonly ProfitOption _profitOption;
 
         public HardwareProductRepository(ApplicationDbContext context, INotificationRepository notificationRepository,
             IWarehouseProductRepository warehouseProductRepository,
-            IWarehouseRepository warehouseRepository, IBranchRepository branchRepository)
+            IWarehouseRepository warehouseRepository, IBranchRepository branchRepository, 
+            IOptions<ProfitOption> option)
         {
             _context = context;
             _notificationRepository = notificationRepository;
             _warehouseProductRepository = warehouseProductRepository;
             _warehouseRepository = warehouseRepository;
             _branchRepository = branchRepository;
+            _profitOption = option.Value;
         }
 
         public async Task Add(HardwareProductDto productDto)
         {
+            double productProfit = (double)productDto.InitialPrice* _profitOption.Value;
+            var costPrice = (productDto.InitialPrice + (decimal) productProfit);
             var newProduct = new HardwareProduct()
             {
                 HardwareStoreId = productDto.HardwareStoreId,
                 Name = productDto.ItemName,
                 Description = productDto.Description,
                 Supplier = productDto.Supplier,
-                CostPrice = productDto.CostPrice,
+                CostPrice = costPrice,
                 CategoryId = productDto.CategoryId,
+                InitialPrice = productDto.InitialPrice
                 //IsActive = productDto.IsActive,
                 //AddedAt = DateTime.Now,
                 //LastModified = DateTime.Now
@@ -251,12 +259,15 @@ namespace ConstructionMaterialOrderingApi.Repositories
                 .FirstOrDefaultAsync();
             if (productToUpdate != null)
             {
+                decimal productProfit = productDto.InitialPrice * (decimal)_profitOption.Value;
+                var costPrice = (productDto.InitialPrice + productProfit);
                 //string imageUrl = UploadImageToFirebaseStorage(productDto.ImageFile);
                 productToUpdate.Name = productDto.ItemName;
                 productToUpdate.Description = productDto.Description;
                 productToUpdate.CategoryId = productDto.CategoryId;
                 productToUpdate.Supplier = productDto.Supplier;
-                productToUpdate.CostPrice = productDto.CostPrice;
+                productToUpdate.CostPrice = costPrice;
+                productToUpdate.InitialPrice = productDto.InitialPrice;
                 //productToUpdate.ImageFile = imageUrl;
                 //productToUpdate.IsActive = productDto.IsActive;
                 //productToUpdate.AddedAt = productDto.AddedAt;
@@ -267,7 +278,7 @@ namespace ConstructionMaterialOrderingApi.Repositories
                 var productsToBeUpdate = await _context.Products.Where(p => p.HardwareProductId == hardwareProductId).ToListAsync();
                 foreach (var product in productsToBeUpdate)
                 {
-                    product.Price = (double)productDto.CostPrice;
+                    product.Price = (double)costPrice;
                     product.Description = productDto.Description;
                     product.CategoryId = productDto.CategoryId;
                     //hjmproduct.ImageFile = imageUrl;

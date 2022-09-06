@@ -1,5 +1,6 @@
 ﻿using ConstructionMaterialOrderingApi.Dtos.AdminDtos;
 using ConstructionMaterialOrderingApi.Dtos.HardwareStoreUserDto;
+using ConstructionMaterialOrderingApi.Helpers;
 using ConstructionMaterialOrderingApi.Models;
 using ConstructionMaterialOrderingApi.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -34,6 +35,7 @@ namespace ConstructionMaterialOrderingApi.Controllers
         [Route("/api/admin/add-role")]
         public async Task<IActionResult> AddRole([FromBody] AddRoleDto roleDto)
         {
+            var allUserRoles = UserRole.AllUserRoles();
             var role = new IdentityRole()
             {
                 Name = roleDto.RoleName
@@ -41,6 +43,10 @@ namespace ConstructionMaterialOrderingApi.Controllers
             if(await _roleManager.RoleExistsAsync(roleDto.RoleName))
             {
                 return BadRequest(new { Success = 0, Message = $"Role {roleDto.RoleName} is already exist."});
+            }
+            if(!allUserRoles.Any(r => r == roleDto.RoleName))
+            {
+                return BadRequest(new { Success = 0, Message = "Invalid Rolename"});
             }
             var result = await _roleManager.CreateAsync(role);
             IActionResult response = result.Succeeded ? Ok(new { Success = 1, Message = $"Role {roleDto.RoleName} is added successfully." }) : 
@@ -85,7 +91,7 @@ namespace ConstructionMaterialOrderingApi.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RegisterHardwareStore([FromBody] RegisterHardwareStoreDto model)
         {
-            string role = "StoreOwner";
+            string role = UserRole.STORE_OWNER;
             var isExist = await _userManager.FindByNameAsync(model.UserName);
             if(isExist != null)
             {
@@ -93,7 +99,9 @@ namespace ConstructionMaterialOrderingApi.Controllers
             }
 
             if (!await _roleManager.RoleExistsAsync(role))
-                return BadRequest(new { Success = 0, Message = "Role is not exist"}); 
+            {
+                await _roleManager.CreateAsync(new IdentityRole { Name = role });
+            }
 
             var hardwareAccount = new ApplicationUser()
             {

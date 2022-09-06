@@ -13,9 +13,11 @@ namespace ConstructionMaterialOrderingApi.Repositories
     public class ConfirmedOrderRepository : IConfirmedOrderRepository
     {
         private readonly ApplicationDbContext _context;
-        public ConfirmedOrderRepository(ApplicationDbContext context)
+        private readonly IDashboardRepository _dashboardRepository;
+        public ConfirmedOrderRepository(ApplicationDbContext context, IDashboardRepository dashboardRepository)
         {
             _context = context;
+            _dashboardRepository = dashboardRepository;
         }
 
         public async Task Add(ConfirmedOrder confirmedOrder)
@@ -144,6 +146,18 @@ namespace ConstructionMaterialOrderingApi.Repositories
                 await _context.RecipientItems.AddRangeAsync(newRecipientItem);
                 await _context.SaveChangesAsync();
             }
+
+            // var orderHardwareProducts = new List<HardwareProduct>();
+            // orderProducts.ForEach((oi) => 
+            //     {
+            //         var hardwareProduct =  _context.HardwareProducts.FirstOrDefault(hp => hp.Id == oi.ProductId);
+            //         if(hardwareProduct != null)
+            //         {
+            //             orderHardwareProducts.Add(hardwareProduct);
+            //         }
+            //     });
+
+            await _dashboardRepository.Upsert(orderProducts, branchId, datenow);
 
             var confirmOrder = await _context.ConfirmedOrders
                 .Where(co => co.OrderId == order.Id && co.BranchId == branchId)

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ConstructionMaterialOrderingApi.Context;
 using ConstructionMaterialOrderingApi.Dtos.BranchDto;
+using ConstructionMaterialOrderingApi.Helpers;
 using ConstructionMaterialOrderingApi.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,7 +28,8 @@ namespace ConstructionMaterialOrderingApi.Repositories
                 HardwareStoreId = hardwareStoreId,
                 Name = branchDto.BranchName,
                 Address = branchDto.Address,
-                IsActive = branchDto.IsActive
+                IsActive = branchDto.IsActive,
+                DateRegistered = DateTime.Now
             };
             _context.Branches.Add(newBranch);
             await _context.SaveChangesAsync();
@@ -79,6 +81,8 @@ namespace ConstructionMaterialOrderingApi.Repositories
                     branchToUpdate.Name = branchDto.BranchName;
                     branchToUpdate.Address = branchDto.Address;
                     branchToUpdate.IsActive = branchDto.IsActive;
+                    branchToUpdate.Latitude = branchDto.Lat;
+                    branchToUpdate.Longitude = branchDto.Lng;
                     await _context.SaveChangesAsync();
 
                     return true;
@@ -92,6 +96,36 @@ namespace ConstructionMaterialOrderingApi.Repositories
             {
                 return false;
             }
+        }
+
+        public async Task<List<Branch>> GetAllBranches(double lat = 0, double lng = 0)
+        {
+            
+            if(lat == 0 || lng == 0)
+            {
+                var branches = await _context.Branches.ToListAsync();
+                return branches;
+            }
+
+            var nearBranches = await _context.Branches
+                .ToListAsync();
+            nearBranches = nearBranches
+                .Where(b => Coordinates.DistanceBetweenPlaces(lng, lat, b.Longitude, b.Latitude) <= 5)
+                .ToList();
+
+            return nearBranches;
+        }
+        public async Task<List<Branch>> Search(string search)
+        {
+            //search = search.Trim('\'');
+            if(string.IsNullOrWhiteSpace(search))
+            {
+                return await GetAllBranches();
+            }
+
+            var branchesFound = await _context.Branches.Where(b => b.Name.Contains(search))
+                .ToListAsync();
+            return branchesFound;
         }
     }
 }

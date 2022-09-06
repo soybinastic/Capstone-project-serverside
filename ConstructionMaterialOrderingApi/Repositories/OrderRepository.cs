@@ -305,31 +305,49 @@ namespace ConstructionMaterialOrderingApi.Repositories
         public async Task<List<GetCustomerOrderHistoryDto>> GetAllCustomerOrdersHistory(int customerId)
         {
             var listOfCustomerOrderHistory = new List<GetCustomerOrderHistoryDto>();
-            if(customerId != 0)
-            {
-                var customerOrderHistories = await _context.CustomerOrderHistories.Where(c => c.CustomerId == customerId)
-                    .ToListAsync(); 
-                foreach(var customerOrderHistory in customerOrderHistories)
+            // if(customerId != 0)
+            // {
+            //     var customerOrderHistories = await _context.CustomerOrderHistories.Where(c => c.CustomerId == customerId)
+            //         .ToListAsync(); 
+            //     foreach(var customerOrderHistory in customerOrderHistories)
+            //     {
+            //         var customerOrderHistoryDto = new GetCustomerOrderHistoryDto()
+            //         {
+            //             CustomerOrderHistoryId = customerOrderHistory.Id,
+            //             CustomerId = customerOrderHistory.CustomerId,
+            //             OrderId = customerOrderHistory.OrderId,
+            //             HardwareStoreId = customerOrderHistory.HardwareStoreId,
+            //             HardwareStoreName = customerOrderHistory.HardwareStoreName,
+            //             OrderDate = customerOrderHistory.OrderDate,
+            //             Total = customerOrderHistory.Total,
+            //             Deliver = customerOrderHistory.Deliver,
+            //             IsRecieved = customerOrderHistory.IsRecieved
+            //         };
+            //         listOfCustomerOrderHistory.Add(customerOrderHistoryDto);
+            //     }
+
+            //     return listOfCustomerOrderHistory;
+            // }
+            var orders = await _context.Orders.Where(o => o.CustomerId == customerId)
+                .ToListAsync();
+            orders.ForEach((order) => 
                 {
-                    var customerOrderHistoryDto = new GetCustomerOrderHistoryDto()
-                    {
-                        CustomerOrderHistoryId = customerOrderHistory.Id,
-                        CustomerId = customerOrderHistory.CustomerId,
-                        OrderId = customerOrderHistory.OrderId,
-                        HardwareStoreId = customerOrderHistory.HardwareStoreId,
-                        HardwareStoreName = customerOrderHistory.HardwareStoreName,
-                        OrderDate = customerOrderHistory.OrderDate,
-                        Total = customerOrderHistory.Total,
-                        Deliver = customerOrderHistory.Deliver,
-                        IsRecieved = customerOrderHistory.IsRecieved
-                    };
-                    listOfCustomerOrderHistory.Add(customerOrderHistoryDto);
-                }
-
-                return listOfCustomerOrderHistory;
-            }
-
-            return listOfCustomerOrderHistory;
+                    var branch = _context.Branches.FirstOrDefault(b => b.Id == order.BranchId);
+                    listOfCustomerOrderHistory.Add(new GetCustomerOrderHistoryDto 
+                        {
+                            CustomerId = order.CustomerId,
+                            OrderId = order.Id,
+                            HardwareStoreId = order.HardwareStoreId,
+                            BranchName = branch.Name,
+                            BrancId = branch.Id,
+                            OrderDate = order.OrderDate,
+                            Total = order.Total,
+                            Deliver = order.Deliver,
+                            IsRecieved = order.IsCustomerOrderRecieved,
+                            Status = order.Status,
+                        });
+                });
+            return listOfCustomerOrderHistory.OrderByDescending(o => o.OrderDate).ToList();
         }
 
         public async Task<GetOrderNotificationNumber> GetOrderNotifNumber(int hardwareStoreId, int branchId)

@@ -11,6 +11,8 @@ namespace ConstructionMaterialOrderingApi.Repositories
         Task<Branch> GetBranch(int branchId);
         Task<List<Branch>> GetBranchesByStoreId(int hardwareStoreId);
         Task<List<Branch>> GetActiveBranches(int hardwareStoreId);
+        Task<List<Branch>> GetAllBranches(double lat = 0, double lng = 0);
+        Task<List<Branch>> Search(string search);
         Task<bool> UpdateBranch(UpdateBranchDto branchDto, int branchId, int hardwareStoreId);
     }
 }

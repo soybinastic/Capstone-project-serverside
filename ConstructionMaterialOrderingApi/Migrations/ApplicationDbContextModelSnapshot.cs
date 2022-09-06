@@ -173,11 +173,23 @@ namespace ConstructionMaterialOrderingApi.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("DateRegistered")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("HardwareStoreId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Image")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
+
+                    b.Property<double>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("float");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -397,6 +409,12 @@ namespace ConstructionMaterialOrderingApi.Migrations
 
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("float");
 
                     b.Property<string>("MiddleName")
                         .HasColumnType("nvarchar(max)");
@@ -627,6 +645,47 @@ namespace ConstructionMaterialOrderingApi.Migrations
                     b.ToTable("CustomerVerifications");
                 });
 
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.Dashboard", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double>("OriginalSales")
+                        .HasColumnType("float");
+
+                    b.Property<double>("PlatformFee")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Profit")
+                        .HasColumnType("float");
+
+                    b.Property<double>("SalesOfMonth")
+                        .HasColumnType("float");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("Total")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
+
+                    b.ToTable("Dashboard");
+                });
+
             modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.DeliverProduct", b =>
                 {
                     b.Property<int>("Id")
@@ -710,6 +769,9 @@ namespace ConstructionMaterialOrderingApi.Migrations
 
                     b.Property<string>("ImageFile")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("InitialPrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -913,6 +975,32 @@ namespace ConstructionMaterialOrderingApi.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("OrderNotificationNumbers");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.PaymentDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("DashboardId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("PaidAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentGateway")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("TotalAmount")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DashboardId");
+
+                    b.ToTable("PaymentDetails");
                 });
 
             modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.Product", b =>
@@ -1681,6 +1769,17 @@ namespace ConstructionMaterialOrderingApi.Migrations
                     b.Navigation("Customer");
                 });
 
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.Dashboard", b =>
+                {
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Branch");
+                });
+
             modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.DeliverProduct", b =>
                 {
                     b.HasOne("ConstructionMaterialOrderingApi.Models.Branch", "Branch")
@@ -1739,6 +1838,17 @@ namespace ConstructionMaterialOrderingApi.Migrations
                         .IsRequired();
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.PaymentDetail", b =>
+                {
+                    b.HasOne("ConstructionMaterialOrderingApi.Models.Dashboard", "Dashboard")
+                        .WithMany()
+                        .HasForeignKey("DashboardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Dashboard");
                 });
 
             modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.RecieveProduct", b =>

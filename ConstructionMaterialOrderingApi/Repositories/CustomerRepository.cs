@@ -38,7 +38,9 @@ namespace ConstructionMaterialOrderingApi.Repositories
                     Email = customer.Email,
                     Age = customer.Age,
                     BirthDate = customer.BirthDate,
-                    IsVerified = customer.IsVerified
+                    IsVerified = customer.IsVerified,
+                    Latitude = customer.Latitude,
+                    Longitude = customer.Longitude
                 };
                 return customerDto;
             }
@@ -78,7 +80,9 @@ namespace ConstructionMaterialOrderingApi.Repositories
                 customer.ContactNo = customerDto.ContactNo;
                 customer.Age = customerDto.Age;
                 customer.BirthDate = customerDto.BirthDate;
-
+                customer.Latitude = customerDto.Lat;
+                customer.Longitude = customerDto.Lng;
+                
                 await _context.SaveChangesAsync();
 
                 return true;

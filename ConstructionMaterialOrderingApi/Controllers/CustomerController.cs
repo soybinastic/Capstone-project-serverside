@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using ConstructionMaterialOrderingApi.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using ConstructionMaterialOrderingApi.Helpers;
 
 namespace ConstructionMaterialOrderingApi.Controllers
 {
@@ -33,14 +34,17 @@ namespace ConstructionMaterialOrderingApi.Controllers
         [Route("/api/customer/register-customer")]
         public async Task<IActionResult> RegisterCustomer([FromBody] CustomerRegisterDto model)
         {
-            string role = "Customer";
+            string role = UserRole.CUSTOMER;
             var isExist = await _userManager.FindByNameAsync(model.UserName);
             if(isExist != null)
             {
                 return BadRequest(new { Success = 0, Message = "Username is already taken."});
             }
             if (!await _roleManager.RoleExistsAsync(role))
-                return BadRequest(new { Success = 0, Message = "Role is not exist."});
+            {
+                await _roleManager.CreateAsync(new IdentityRole{ Name = role});
+            }
+                
 
             var customerUser = new ApplicationUser()
             {

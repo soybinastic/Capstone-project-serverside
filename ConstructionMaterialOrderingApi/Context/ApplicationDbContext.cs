@@ -60,5 +60,7 @@ namespace ConstructionMaterialOrderingApi.Context
         public DbSet<RecipientItem> RecipientItems { get; set; }
         public DbSet<CompanyRegister> CompanyRegisters { get; set; }
         public DbSet<CustomerVerification> CustomerVerifications { get; set; }
+        public DbSet<Dashboard> Dashboard { get; set; }
+        public DbSet<PaymentDetail> PaymentDetails { get; set; }
     }
 }

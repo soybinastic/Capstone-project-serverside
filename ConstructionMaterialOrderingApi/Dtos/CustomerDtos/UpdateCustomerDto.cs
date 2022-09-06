@@ -22,5 +22,7 @@ namespace ConstructionMaterialOrderingApi.Dtos.CustomerDtos
         public int Age { get; set; }
         [Required]
         public DateTime BirthDate { get; set; }
+        public double Lat { get; set; }
+        public double Lng { get; set; }
     }
 }

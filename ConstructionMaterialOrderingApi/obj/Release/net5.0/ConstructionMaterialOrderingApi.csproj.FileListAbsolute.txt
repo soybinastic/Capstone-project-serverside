@@ -139,3 +139,4 @@ C:\Users\Cristian Rec Aboc\capstone_projects\Capstone-project-serverside\Constru
 C:\Users\Cristian Rec Aboc\capstone_projects\Capstone-project-serverside\ConstructionMaterialOrderingApi\obj\Release\net5.0\ConstructionMaterialOrderingApi.pdb
 C:\Users\Cristian Rec Aboc\capstone_projects\Capstone-project-serverside\ConstructionMaterialOrderingApi\obj\Release\net5.0\ConstructionMaterialOrderingApi.genruntimeconfig.cache
 C:\Users\Cristian Rec Aboc\capstone_projects\Capstone-project-serverside\ConstructionMaterialOrderingApi\obj\Release\net5.0\ref\ConstructionMaterialOrderingApi.dll
+C:\Users\Cristian Rec Aboc\capstone_projects\Capstone-project-serverside\ConstructionMaterialOrderingApi\bin\Release\net5.0\Stripe.net.dll

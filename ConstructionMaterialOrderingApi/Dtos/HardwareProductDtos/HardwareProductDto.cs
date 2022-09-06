@@ -19,8 +19,8 @@ namespace ConstructionMaterialOrderingApi.Dtos.HardwareProductDtos
         [Required(ErrorMessage = "Supplier is required")]
         public string Supplier { get; set; }
         public int StockNumber { get; set; }
-        [Required(ErrorMessage = "Cost price is required")]
-        public decimal CostPrice { get; set; }
+        [Required(ErrorMessage = "Initial price is required")]
+        public decimal InitialPrice { get; set; }
         public bool IsActive { get; set; }
         public DateTime AddedAt { get; set; }
     }

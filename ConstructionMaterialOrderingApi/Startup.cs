@@ -1,4 +1,5 @@
 using ConstructionMaterialOrderingApi.Context;
+using ConstructionMaterialOrderingApi.Helpers;
 using ConstructionMaterialOrderingApi.Hubs;
 using ConstructionMaterialOrderingApi.Implementations;
 using ConstructionMaterialOrderingApi.Models;
@@ -96,7 +97,7 @@ namespace ConstructionMaterialOrderingApi
 
             //configuring all my repositories
             services.ConfigureRepositories();
-
+            services.Configure<ProfitOption>(Configuration.GetSection(nameof(ProfitOption)));
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ConstructionMaterialOrderingApi", Version = "v1" });
@@ -120,11 +121,11 @@ namespace ConstructionMaterialOrderingApi
             app.UseStaticFiles();
 
             // temporary comment this code for deployment reason.
-            // app.UseStaticFiles(new StaticFileOptions
-            // {
-            //     FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"Resources")),
-            //     RequestPath = new PathString("/Resources")
-            // });
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"Resources")),
+                RequestPath = new PathString("/Resources")
+            });
 
             app.UseAuthentication();
             app.UseAuthorization();

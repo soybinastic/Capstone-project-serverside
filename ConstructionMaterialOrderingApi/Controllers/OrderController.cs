@@ -73,7 +73,15 @@ namespace ConstructionMaterialOrderingApi.Controllers
             });
 
             return Ok(customerOrderHistoriesJsonObject);
-        } 
+        }
+
+        [HttpGet("customer-order-products/{storeId}/{branchId}/{orderId}")] 
+        [Authorize(Roles = "Customer")]
+        public async Task<IActionResult> GetCustomerOrderProductsHistory([FromRoute]int storeId, [FromRoute]int branchId, [FromRoute]int orderId)
+        {
+            var orderProducts = await _orderRepository.GetCustomerOrderProducts(storeId, orderId, branchId);
+            return Ok(ConvertToJsonString(orderProducts));
+        }
 
         [HttpGet]
         [Route("/api/order/get-orders")]
@@ -296,6 +304,17 @@ namespace ConstructionMaterialOrderingApi.Controllers
         private string ConvertCustomerOrderProductsToJsonObject(List<GetCustomerOrderProductDto> customerOrderProducts)
         {
             var jsonObject = JsonConvert.SerializeObject(customerOrderProducts, new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            });
+
+            return jsonObject;
+        }
+
+        private string ConvertToJsonString<T>(T obj)
+        {
+            var jsonObject = JsonConvert.SerializeObject(obj, new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented,
                 ContractResolver = new CamelCasePropertyNamesContractResolver()

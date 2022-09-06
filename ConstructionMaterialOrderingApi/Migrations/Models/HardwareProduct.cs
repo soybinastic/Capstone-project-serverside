@@ -17,6 +17,8 @@ namespace ConstructionMaterialOrderingApi.Models
         public string Supplier { get; set; }
         [Column(TypeName = "decimal(18,2)")]
         public decimal CostPrice { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal InitialPrice { get; set; }
         public string ImageFile { get; set; }
     }
 }

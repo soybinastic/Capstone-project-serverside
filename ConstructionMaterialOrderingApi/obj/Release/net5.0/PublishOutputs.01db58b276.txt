@@ -25,6 +25,7 @@ C:\Users\Cristian Rec Aboc\capstone_projects\Capstone-project-serverside\Constru
 C:\Users\Cristian Rec Aboc\capstone_projects\Capstone-project-serverside\ConstructionMaterialOrderingApi\bin\Release\net5.0\publish\Microsoft.IdentityModel.Tokens.dll
 C:\Users\Cristian Rec Aboc\capstone_projects\Capstone-project-serverside\ConstructionMaterialOrderingApi\bin\Release\net5.0\publish\Microsoft.OpenApi.dll
 C:\Users\Cristian Rec Aboc\capstone_projects\Capstone-project-serverside\ConstructionMaterialOrderingApi\bin\Release\net5.0\publish\Newtonsoft.Json.dll
+C:\Users\Cristian Rec Aboc\capstone_projects\Capstone-project-serverside\ConstructionMaterialOrderingApi\bin\Release\net5.0\publish\Stripe.net.dll
 C:\Users\Cristian Rec Aboc\capstone_projects\Capstone-project-serverside\ConstructionMaterialOrderingApi\bin\Release\net5.0\publish\Swashbuckle.AspNetCore.Swagger.dll
 C:\Users\Cristian Rec Aboc\capstone_projects\Capstone-project-serverside\ConstructionMaterialOrderingApi\bin\Release\net5.0\publish\Swashbuckle.AspNetCore.SwaggerGen.dll
 C:\Users\Cristian Rec Aboc\capstone_projects\Capstone-project-serverside\ConstructionMaterialOrderingApi\bin\Release\net5.0\publish\Swashbuckle.AspNetCore.SwaggerUI.dll
