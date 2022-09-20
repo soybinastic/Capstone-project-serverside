@@ -7,17 +7,21 @@ using ConstructionMaterialOrderingApi.Helpers;
 using ConstructionMaterialOrderingApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Stripe.Checkout;
 
 namespace ConstructionMaterialOrderingApi.Repositories
 {
     public class DashboardRepository : IDashboardRepository
     {
         private readonly ApplicationDbContext _db;
+        private readonly IPaymentRepository<Session> _paymentRepository;
         private readonly ProfitOption _profitOption;
-        public DashboardRepository(ApplicationDbContext db, IOptions<ProfitOption> profitOption)
+        public DashboardRepository(ApplicationDbContext db, IOptions<ProfitOption> profitOption, 
+            IPaymentRepository<Session> paymentRepository)
         {
             _db = db;
             _profitOption = profitOption.Value;
+            _paymentRepository = paymentRepository;
         }
         public async Task<List<Dashboard>> GetAll()
         {
@@ -69,6 +73,24 @@ namespace ConstructionMaterialOrderingApi.Repositories
                 .ToListAsync();
             
             return dashboard;
+        }
+
+        public async Task UpdateStatus(int dashboardId, string status = "PAID")
+        {
+            var dashboard = await _db.Dashboard.Where(d => d.Id == dashboardId && d.Status != Keyword.ON_GOING && d.Status != Keyword.PAID)
+                .FirstOrDefaultAsync();
+            if(dashboard == null) return;
+
+            dashboard.Status = status;
+            await _db.SaveChangesAsync();
+            await _paymentRepository.Create(new PaymentDetail 
+                {
+                    DashboardId = dashboardId,
+                    Dashboard = dashboard,
+                    PaidAt = DateTime.UtcNow,
+                    PaymentGateway = "Stripe",
+                    TotalAmount = dashboard.Total + dashboard.PlatformFee
+                });
         }
 
         public async Task Upsert(List<CustomerOrderProduct> orderItems, int branchId, DateTime datenow)

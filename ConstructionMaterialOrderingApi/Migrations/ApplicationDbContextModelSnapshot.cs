@@ -194,6 +194,9 @@ namespace ConstructionMaterialOrderingApi.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<double>("Range")
+                        .HasColumnType("float");
+
                     b.HasKey("Id");
 
                     b.ToTable("Branches");
@@ -944,6 +947,9 @@ namespace ConstructionMaterialOrderingApi.Migrations
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<double>("ShippingFee")
+                        .HasColumnType("float");
 
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");

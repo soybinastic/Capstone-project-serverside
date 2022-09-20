@@ -10,5 +10,6 @@ namespace ConstructionMaterialOrderingApi.Repositories
         Task<T> OnPay(Dashboard dashboard, string successUrl = null, string cancelUrl = null);
         Task<List<PaymentDetail>> GetAllPaymentDetails();
         Task<PaymentDetail> GetPaymentDetail(int paymentDetailId);
+        Task Create(PaymentDetail newPaymentDetails);
     }
 }

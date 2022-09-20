@@ -81,7 +81,7 @@ namespace ConstructionMaterialOrderingApi.Controllers
             return returnValue;
         }
         [HttpGet("all-branches")]
-        public async Task<IActionResult> GetAllBranches()
+        public async Task<IActionResult> GetAllBranches([FromQuery(Name = "adjusted_km")]double adjustedKm)
         {
             try
             {
@@ -90,9 +90,9 @@ namespace ConstructionMaterialOrderingApi.Controllers
 
                 double lat = customerLat.ToLatLng();
                 double lng = customerLng.ToLatLng();
-                Console.WriteLine($"Lat: {lat} Lng: {lng}");
+                
 
-                var allBranches = await _branchRepository.GetAllBranches(lat, lng);
+                var allBranches = await _branchRepository.GetAllBranches(lat, lng, adjustedKm);
                 // Console.WriteLine(HttpContext.User.Identity.IsAuthenticated);
                 return Ok(ConvertToJson(allBranches));
 
@@ -102,10 +102,24 @@ namespace ConstructionMaterialOrderingApi.Controllers
             }
         }
         [HttpGet("search")]
-        public async Task<IActionResult> Search([FromQuery(Name = "search")]string branchName)
+        public async Task<IActionResult> Search([FromQuery(Name = "search")]string search, 
+            [FromQuery(Name = "adjusted_km")]double adjustedKm)
         {
-            var foundBranches = await _branchRepository.Search(branchName);
-            return Ok(ConvertToJson(foundBranches));
+            try
+            {
+                // get lat lang from request headers.
+                string latString = HttpContext.Request.Headers["lat"];
+                string lngString = HttpContext.Request.Headers["lng"];
+
+                double lat = latString.ToLatLng();
+                double lng = lngString.ToLatLng();
+            
+                var result = await _branchRepository.Search(search, lat, lng, adjustedKm);
+                return Ok(ConvertToJson(result));
+            }catch(Exception ex)
+            {
+                return BadRequest(new { Success = 0, Message = ex.Message });
+            }
         }
         private string ConvertToJson<T>(T val)
         {

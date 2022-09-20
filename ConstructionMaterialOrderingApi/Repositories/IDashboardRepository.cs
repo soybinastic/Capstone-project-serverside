@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ConstructionMaterialOrderingApi.Helpers;
 using ConstructionMaterialOrderingApi.Models;
 
 namespace ConstructionMaterialOrderingApi.Repositories
@@ -13,5 +14,6 @@ namespace ConstructionMaterialOrderingApi.Repositories
         Task<List<Dashboard>> GetAll(int branchId);
         Task<List<Dashboard>> ToPay(int branchId);
         Task<Dashboard> GetById(int dashboardId);
+        Task UpdateStatus(int dashboardId, string status = Keyword.PAID);
     }
 }

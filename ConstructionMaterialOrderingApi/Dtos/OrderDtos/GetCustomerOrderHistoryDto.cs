@@ -19,5 +19,6 @@ namespace ConstructionMaterialOrderingApi.Dtos.OrderDtos
         public string BranchName { get; set; }
         public int BrancId { get; set; }
         public string Status { get; set; }
+        public double ShippingFee { get; set; }
     }
 }

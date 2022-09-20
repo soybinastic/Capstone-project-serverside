@@ -55,6 +55,13 @@ namespace ConstructionMaterialOrderingApi.Controllers
             return Ok(ConvertToJson(dashboards));
         }
 
+        [HttpPut("update-status/{dashboardId:int}")]
+        [Authorize(Roles = "StoreAdmin")]
+        public async Task<IActionResult> UpdateStatus([FromRoute]int dashboardId)
+        {
+            await _dashboardRepository.UpdateStatus(dashboardId);
+            return NoContent();
+        }
         
         private string ConvertToJson<T>(T val)
         {

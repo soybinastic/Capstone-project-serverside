@@ -29,6 +29,7 @@ namespace ConstructionMaterialOrderingApi.Dtos.OrderDtos
         public List<GetProductToCartDto> Products { get; set; }
         public string Latitude { get; set; }
         public string Longtitude { get; set; }
+        public double ShippingFee { get; set; }
         //[Required]
         //public IFormFile Nbi { get; set; }
         //[Required]

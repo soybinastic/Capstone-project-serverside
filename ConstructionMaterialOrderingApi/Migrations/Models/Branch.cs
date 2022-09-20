@@ -15,6 +15,7 @@ namespace ConstructionMaterialOrderingApi.Models
         public DateTime DateRegistered { get; set; }
         public double Longitude { get; set; }
         public double Latitude { get; set; }
+        public double Range { get; set; }
         public string Image { get; set; }
     }
 }

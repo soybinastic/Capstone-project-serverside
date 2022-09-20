@@ -18,6 +18,13 @@ namespace ConstructionMaterialOrderingApi.Repositories
             string apiSecretKey = configuration["StripeSecretKey"] as string;
             StripeConfiguration.ApiKey = apiSecretKey;
         }
+
+        public async Task Create(PaymentDetail newPaymentDetails)
+        {
+            await _db.PaymentDetails.AddAsync(newPaymentDetails);
+            await _db.SaveChangesAsync();
+        }
+
         public Task<List<PaymentDetail>> GetAllPaymentDetails()
         {
             throw new NotImplementedException();

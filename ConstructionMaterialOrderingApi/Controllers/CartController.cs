@@ -10,6 +10,7 @@ using ConstructionMaterialOrderingApi.Repositories;
 using System.Security.Claims;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using ConstructionMaterialOrderingApi.Helpers;
 
 namespace ConstructionMaterialOrderingApi.Controllers
 {
@@ -20,12 +21,14 @@ namespace ConstructionMaterialOrderingApi.Controllers
         private readonly ICustomerRepository _customerRepository;
         private readonly ICartRepository _cartRepository;
         private readonly IStoreAdminRepository _storeAdminRepository;
-
-        public CartController(ICustomerRepository customerRepository, ICartRepository cartRepository, IStoreAdminRepository storeAdminRepository)
+        private readonly IBranchRepository _branchRepository;
+        public CartController(ICustomerRepository customerRepository, ICartRepository cartRepository, 
+            IStoreAdminRepository storeAdminRepository, IBranchRepository branchRepository)
         {
             _customerRepository = customerRepository;
             _cartRepository = cartRepository;
             _storeAdminRepository = storeAdminRepository;
+            _branchRepository = branchRepository;
         } 
 
         [HttpPost]
@@ -48,10 +51,14 @@ namespace ConstructionMaterialOrderingApi.Controllers
         {
             var customerUserAccountId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customer = await _customerRepository.GetCustomerByAccountId(customerUserAccountId);
-
+            var branch = await _branchRepository.GetBranch(branchId);
+            double shippingFee = ShippingFee.Get(customer, branch);
+            
             var productsInCart = await _cartRepository.GetAllProductsToCart(customer.CustomerId, storeId, branchId);
 
-            var productsInCartJsonObj = JsonConvert.SerializeObject(productsInCart, new JsonSerializerSettings 
+            var cartDetailsDto = new CartDetailsDto(shippingFee, productsInCart);
+
+            var productsInCartJsonObj = JsonConvert.SerializeObject(cartDetailsDto, new JsonSerializerSettings 
             {
                 Formatting = Formatting.Indented,
                 ContractResolver = new CamelCasePropertyNamesContractResolver()

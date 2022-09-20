@@ -68,7 +68,8 @@ namespace ConstructionMaterialOrderingApi.Repositories
                     IsOrderCanceled = false,
                     OrderDate = DateTime.Now,
                     Status = "Pending",
-                    IsApproved = false
+                    IsApproved = false,
+                    ShippingFee = model.ShippingFee
                 };
 
                 await _context.Orders.AddAsync(order);
@@ -345,6 +346,7 @@ namespace ConstructionMaterialOrderingApi.Repositories
                             Deliver = order.Deliver,
                             IsRecieved = order.IsCustomerOrderRecieved,
                             Status = order.Status,
+                            ShippingFee = order.ShippingFee
                         });
                 });
             return listOfCustomerOrderHistory.OrderByDescending(o => o.OrderDate).ToList();

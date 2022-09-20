@@ -21,5 +21,6 @@ namespace ConstructionMaterialOrderingApi.Models
         public string Status { get; set; }
         public DateTime DateConfirmed { get; set; }
         public bool IsApproved { get; set; }
+        public double ShippingFee { get; set; }
     }
 }

@@ -83,6 +83,7 @@ namespace ConstructionMaterialOrderingApi.Repositories
                     branchToUpdate.IsActive = branchDto.IsActive;
                     branchToUpdate.Latitude = branchDto.Lat;
                     branchToUpdate.Longitude = branchDto.Lng;
+                    branchToUpdate.Range = branchDto.Range;
                     await _context.SaveChangesAsync();
 
                     return true;
@@ -98,34 +99,43 @@ namespace ConstructionMaterialOrderingApi.Repositories
             }
         }
 
-        public async Task<List<Branch>> GetAllBranches(double lat = 0, double lng = 0)
+        public async Task<List<BranchDto>> GetAllBranches(double lat = 0, double lng = 0, double adjustedKm = 0)
         {
-            
+            var branches = await _context.Branches.ToListAsync();
+
             if(lat == 0 || lng == 0)
             {
-                var branches = await _context.Branches.ToListAsync();
-                return branches;
+                var branchesDto = branches.Select(b => new BranchDto(b.Id, b.HardwareStoreId, b.Name, b.Address, b.IsActive, b.DateRegistered,
+                    b.Longitude, b.Latitude, b.Range, b.Image, 0))
+                    .ToList();
+
+                return branchesDto;
             }
 
-            var nearBranches = await _context.Branches
-                .ToListAsync();
-            nearBranches = nearBranches
-                .Where(b => Coordinates.DistanceBetweenPlaces(lng, lat, b.Longitude, b.Latitude) <= 5)
+            // nearBranches = nearBranches
+            //     .Where(b => Coordinates.DistanceBetweenPlaces(lng, lat, b.Longitude, b.Latitude) <= 5)
+            //     .ToList();
+            var nearBranches = branches
+                .Where(b => Coordinates.DistanceBetweenPlaces(lng, lat, b.Longitude, b.Latitude) <= adjustedKm
+                && b.Range >= Coordinates.DistanceBetweenPlaces(lng, lat, b.Longitude, b.Latitude)
+                && b.IsActive)
+                .Select(b => new BranchDto(b.Id, b.HardwareStoreId, b.Name, b.Address, b.IsActive, b.DateRegistered,
+                    b.Longitude, b.Latitude, b.Range, b.Image, Coordinates.DistanceBetweenPlaces(lng, lat, b.Longitude, b.Latitude)))
                 .ToList();
 
             return nearBranches;
         }
-        public async Task<List<Branch>> Search(string search)
+        public async Task<List<BranchDto>> Search(string search, double lat = 0, double lng = 0, double adjustedKm = 0)
         {
+            var branches = await GetAllBranches(lat, lng, adjustedKm);
             //search = search.Trim('\'');
             if(string.IsNullOrWhiteSpace(search))
             {
-                return await GetAllBranches();
+                return branches;
             }
 
-            var branchesFound = await _context.Branches.Where(b => b.Name.Contains(search))
-                .ToListAsync();
-            return branchesFound;
+            branches = branches.Where(b => b.Name.ToLower().Contains(search.ToLower()) || b.Address.ToLower().Contains(search.ToLower())).ToList();
+            return branches;
         }
     }
 }

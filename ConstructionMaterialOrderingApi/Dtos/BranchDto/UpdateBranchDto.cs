@@ -16,5 +16,6 @@ namespace ConstructionMaterialOrderingApi.Dtos.BranchDto
         public bool IsActive { get; set; }
         public double Lat { get; set; }
         public double Lng { get; set; }
+        public double Range { get; set; }
     }
 }
