@@ -4,14 +4,16 @@ using ConstructionMaterialOrderingApi.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ConstructionMaterialOrderingApi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220922005032_AddCashierAndSalesClerkTable")]
+    partial class AddCashierAndSalesClerkTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1007,28 +1009,6 @@ namespace ConstructionMaterialOrderingApi.Migrations
                     b.ToTable("OrderNotificationNumbers");
                 });
 
-            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.OrderToPrepare", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SalesClerkId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
-
-                    b.HasIndex("SalesClerkId");
-
-                    b.ToTable("OrderToPrepares");
-                });
-
             modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.PaymentDetail", b =>
                 {
                     b.Property<int>("Id")
@@ -1914,25 +1894,6 @@ namespace ConstructionMaterialOrderingApi.Migrations
                         .IsRequired();
 
                     b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.OrderToPrepare", b =>
-                {
-                    b.HasOne("ConstructionMaterialOrderingApi.Models.Order", "Order")
-                        .WithMany()
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ConstructionMaterialOrderingApi.Models.SalesClerk", "SalesClerk")
-                        .WithMany()
-                        .HasForeignKey("SalesClerkId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-
-                    b.Navigation("SalesClerk");
                 });
 
             modelBuilder.Entity("ConstructionMaterialOrderingApi.Models.PaymentDetail", b =>

@@ -1,4 +1,6 @@
 ﻿using ConstructionMaterialOrderingApi.Dtos.HardwareStoreUserDto;
+using ConstructionMaterialOrderingApi.Helpers;
+using ConstructionMaterialOrderingApi.Models;
 using ConstructionMaterialOrderingApi.Repositories;
 using System;
 using System.Collections.Generic;
@@ -13,14 +15,19 @@ namespace ConstructionMaterialOrderingApi.Implementations
         private readonly ITransportAgentRepository _transportAgentRepository;
         private readonly IWareHouseAdminRepository _wareHouseAdminRepository;
         private readonly IStoreAdminRepository _storeAdminRepository;
+        private readonly IBranchUserRepository<Cashier> _cashierRepository;
+        private readonly IBranchUserRepository<SalesClerk> _salesClerkRepository;
 
         public HardwareStoreUserHandler(ISuperAdminRepository superAdminRepository, ITransportAgentRepository transportAgentRepository,
-            IWareHouseAdminRepository wareHouseAdminRepository, IStoreAdminRepository storeAdminRepository)
+            IWareHouseAdminRepository wareHouseAdminRepository, IStoreAdminRepository storeAdminRepository,
+            IBranchUserRepository<Cashier> cashierRepository, IBranchUserRepository<SalesClerk> salesClerkRepository)
         {
             _superAdminRepository = superAdminRepository;
             _transportAgentRepository = transportAgentRepository;
             _wareHouseAdminRepository = wareHouseAdminRepository;
             _storeAdminRepository = storeAdminRepository;
+            _cashierRepository = cashierRepository;
+            _salesClerkRepository = salesClerkRepository;
         }
 
         public void CreateUser(IHardwareStoreUser hardwareStoreUser, HardwareStoreUserDto storeUserDto,
@@ -41,6 +48,10 @@ namespace ConstructionMaterialOrderingApi.Implementations
                     return new WarehouseAdminCreator(_wareHouseAdminRepository);
                 case "StoreAdmin":
                     return new StoreAdmin(_storeAdminRepository);
+                case UserRole.CASHIER:
+                    return new CashierCreator(_cashierRepository);
+                case UserRole.SALES_CLERK:
+                    return new SalesClerkCreator(_salesClerkRepository);
                 default:
                     return null;
             };

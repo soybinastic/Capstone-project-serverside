@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
 using ConstructionMaterialOrderingApi.Models;
+using ConstructionMaterialOrderingApi.Helpers;
 
 namespace ConstructionMaterialOrderingApi.Controllers
 {
@@ -27,12 +28,16 @@ namespace ConstructionMaterialOrderingApi.Controllers
         private readonly IStoreAdminRepository _storeAdminRepository;
         private readonly IHardwareStoreUserRepository _hardwareStoreUserRepository;
         private readonly IConfirmedOrderRepository _confirmedOrderRepository;
+        private readonly IBranchUserRepository<Cashier> _cahierRepository;
+        private readonly IBranchUserRepository<SalesClerk> _salesClerkRepository;
+        private readonly IOrderPreparationRepository _orderPreparationRepository;
 
         public OrderController(ICustomerRepository customerRepository, IOrderRepository orderRepository, 
             IHardwareStoreRepository hardwareStoreRepository, UserManager<ApplicationUser> userManager,
             ITransportAgentRepository transportAgentRepository, IStoreAdminRepository storeAdminRepository, 
             IHardwareStoreUserRepository hardwareStoreUserRepository, 
-            IConfirmedOrderRepository confirmedOrderRepository)
+            IConfirmedOrderRepository confirmedOrderRepository, IBranchUserRepository<Cashier> cahierRepository,
+            IOrderPreparationRepository orderPreparationRepository, IBranchUserRepository<SalesClerk> salesClerkRepository)
         {
             _customerRepository = customerRepository;
             _orderRepository = orderRepository;
@@ -42,6 +47,9 @@ namespace ConstructionMaterialOrderingApi.Controllers
             _storeAdminRepository = storeAdminRepository;
             _hardwareStoreUserRepository = hardwareStoreUserRepository;
             _confirmedOrderRepository = confirmedOrderRepository;
+            _cahierRepository = cahierRepository;
+            _orderPreparationRepository = orderPreparationRepository;
+            _salesClerkRepository = salesClerkRepository;
         } 
 
         [HttpPost]
@@ -102,6 +110,7 @@ namespace ConstructionMaterialOrderingApi.Controllers
             {
                 var transportAgent = await _transportAgentRepository.GetTransportAgentByAccountID(hardwareStoreUserAccountId);
                 var orders = await _orderRepository.GetAllOrders(transportAgent.HardwareStoreId, transportAgent.BranchId);
+                orders = orders.Where(o => o.Status == OrderStatus.TO_DELIVER).ToList();
                 return Ok(ConvertOrdersToJsonObject(orders));
             }
 
@@ -125,7 +134,7 @@ namespace ConstructionMaterialOrderingApi.Controllers
          
         [HttpGet]
         [Route("/api/order/get-customer-details/{orderId}")]
-        [Authorize(Roles = "StoreAdmin,TransportAgent")]
+        [Authorize(Roles = "StoreAdmin,TransportAgent,SalesClerk")]
         public async Task<IActionResult> GetCustumerOrderDetails(int orderId)
         {
             var hardwareStoreUserAccountId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -143,13 +152,19 @@ namespace ConstructionMaterialOrderingApi.Controllers
                 var customerOrderDetails = await _orderRepository.GetCustomerOrderDetails(hardwareStoreTranspAgent.HardwareStoreId, orderId, hardwareStoreTranspAgent.BranchId);
                 return Ok(customerOrderDetails);
             }
+            else if(role.FirstOrDefault() == "SalesClerk")
+            {
+                var salesClerk = await _salesClerkRepository.GetByAccountId(hardwareStoreUserAccountId);
+                var customerOrderDetails = await _orderRepository.GetCustomerOrderDetails(salesClerk.HardwareStoreId, orderId, salesClerk.BranchId);
+                return Ok(customerOrderDetails);
+            }
 
             return BadRequest(new { Success = 0, Message = "Something went wrong." });
         }
 
         [HttpGet]
         [Route("/api/order/get-order/{orderId}")]
-        [Authorize(Roles = "StoreAdmin,TransportAgent")]
+        [Authorize(Roles = "StoreAdmin,TransportAgent,SalesClerk")]
         public async Task<IActionResult> GetOrder(int orderId)
         {
             Order order = null;
@@ -166,6 +181,11 @@ namespace ConstructionMaterialOrderingApi.Controllers
                 var transportAgent = await _transportAgentRepository.GetTransportAgentByAccountID(appUserId);
                 order = await _orderRepository.GetOrder(orderId, transportAgent.BranchId);
             }
+            else if(roles.FirstOrDefault() == "SalesClerk")
+            {
+                var salesClerk = await _salesClerkRepository.GetByAccountId(appUserId);
+                order = await _orderRepository.GetOrder(orderId, salesClerk.BranchId);
+            }
 
             var orderJson = JsonConvert.SerializeObject(order, new JsonSerializerSettings
             {
@@ -178,7 +198,7 @@ namespace ConstructionMaterialOrderingApi.Controllers
 
         [HttpGet]
         [Route("/api/order/get-order-products/{orderId}")]
-        [Authorize(Roles = "StoreAdmin,TransportAgent")]
+        [Authorize(Roles = "StoreAdmin,TransportAgent,SalesClerk")]
         public async Task<IActionResult> GetCustomerOrderProducts(int orderId)
         {
             var hardwareStoreUserAccountId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -194,6 +214,12 @@ namespace ConstructionMaterialOrderingApi.Controllers
             {
                 var transportAgent = await _transportAgentRepository.GetTransportAgentByAccountID(hardwareStoreUserAccountId);
                 var customerOrderProducts = await _orderRepository.GetCustomerOrderProducts(transportAgent.HardwareStoreId, orderId, transportAgent.BranchId);
+                return Ok(ConvertCustomerOrderProductsToJsonObject(customerOrderProducts));
+            }
+            else if(role.FirstOrDefault() == "SalesClerk")
+            {
+                var salesClerk = await _salesClerkRepository.GetByAccountId(hardwareStoreUserAccountId);
+                var customerOrderProducts = await _orderRepository.GetCustomerOrderProducts(salesClerk.HardwareStoreId, orderId, salesClerk.BranchId);
                 return Ok(ConvertCustomerOrderProductsToJsonObject(customerOrderProducts));
             }
 
@@ -246,13 +272,13 @@ namespace ConstructionMaterialOrderingApi.Controllers
 
         [HttpGet]
         [Route("get-completed-orders")]
-        [Authorize(Roles = "StoreAdmin")]
+        [Authorize(Roles = "Cashier")]
         public async Task<IActionResult> GetCompletedOrders()
         {
             var userAppId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var storeAdmin = await _storeAdminRepository.GetStoreAdminByAccountId(userAppId);
-            var confirmedOrders = await _confirmedOrderRepository.GetConfirmedOrders(storeAdmin.BranchId);
-
+            var cashier = await _cahierRepository.GetByAccountId(userAppId);
+            var confirmedOrders = await _confirmedOrderRepository.GetConfirmedOrders(cashier.BranchId);
+            
             var jsonObject = JsonConvert.SerializeObject(confirmedOrders, new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented,
@@ -280,25 +306,56 @@ namespace ConstructionMaterialOrderingApi.Controllers
 
         [HttpPut]
         [Route("confirm-order/{orderId}")]
-        [Authorize(Roles = "StoreAdmin")]
+        [Authorize(Roles = "Cashier")]
         public async Task<IActionResult> ConfirmOrder([FromRoute]int orderId)
         {
             var userAppId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var storeAdmin = await _storeAdminRepository.GetStoreAdminByAccountId(userAppId);
+            var cashier = await _cahierRepository.GetByAccountId(userAppId);
 
-            var result = await _confirmedOrderRepository.ConfirmOrder(orderId, storeAdmin.BranchId);
+            var result = await _confirmedOrderRepository.ConfirmOrder(orderId, cashier.BranchId);
             return result ? Ok(new { Success = 1, Message = "Confirmed Successfully"}) : BadRequest(new { Success = 0, Message = "Failed to confirm"});
         }
 
         [HttpPut]
-        [Route("approve-order/{orderId}")]
+        [Route("approve-order/{orderId}/{salesClerkId}")]
         [Authorize(Roles = "StoreAdmin")]
-        public async Task<IActionResult> ApproveOrder([FromRoute]int orderId)
+        public async Task<IActionResult> ApproveOrder([FromRoute]int orderId, [FromRoute]int salesClerkId)
         {
+            var salesClerkAvailable = await _orderPreparationRepository.SalesClerkAvailable(salesClerkId);
+            if(!salesClerkAvailable) return BadRequest(new { Success = 0, Message = "The selected sales clerk not yet available."});
+
             var userAppId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var storeAdmin = await _storeAdminRepository.GetStoreAdminByAccountId(userAppId);
-            var result = await _orderRepository.ApproveOrder(storeAdmin.BranchId, orderId);
+            var result = await _orderRepository.ApproveOrder(storeAdmin.BranchId, orderId, salesClerkId);
             return result ? Ok(new { Success = 1, Message = "Order Approved"}) : BadRequest(new { Success = 0, Message = "Failed to approve"});
+        }
+
+        [HttpGet("preparations")]
+        [Authorize(Roles = "SalesClerk")]
+        public async Task<IActionResult> GetPreparations()
+        {
+            var userId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var salesClerk = await _salesClerkRepository.GetByAccountId(userId);
+            var orderToprepares = await _orderPreparationRepository.GetAll(salesClerk.Id);
+            return Ok(ConvertToJsonString(orderToprepares));
+        }
+
+        [HttpPut("to-deliver/{orderId}")]
+        [Authorize(Roles = "SalesClerk")]
+        public async Task<IActionResult> ToDeliver([FromRoute]int orderId)
+        {
+            var result = await _orderPreparationRepository.ToDeliver(orderId);
+            return result != null ? Ok(result) : BadRequest(new { Success = 0, Message = "Somthing went wrong"});
+        }
+
+        [HttpGet("sales-clerks")]
+        [Authorize(Roles = "StoreAdmin")]
+        public async Task<IActionResult> SalesClerk()
+        {
+            var userId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var storeAdmin = await _storeAdminRepository.GetStoreAdminByAccountId(userId);
+            var salesClerk = await _orderPreparationRepository.GetAvailableSalesClerk(storeAdmin.BranchId);
+            return Ok(ConvertToJsonString(salesClerk));
         }
 
         private string ConvertCustomerOrderProductsToJsonObject(List<GetCustomerOrderProductDto> customerOrderProducts)

@@ -109,7 +109,7 @@ namespace ConstructionMaterialOrderingApi.Controllers
         }
         [HttpGet]
         [Route("user-logged-in-info")]
-        [Authorize(Roles = "StoreOwner,SuperAdmin,WarehouseAdmin,TransportAgent,StoreAdmin")]
+        [Authorize(Roles = "StoreOwner,SuperAdmin,WarehouseAdmin,TransportAgent,StoreAdmin,Cashier,SalesClerk")]
         public async Task<IActionResult> UserLoggedInfo()
         {
             var appUserId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);

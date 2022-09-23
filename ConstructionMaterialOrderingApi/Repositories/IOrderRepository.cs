@@ -18,6 +18,6 @@ namespace ConstructionMaterialOrderingApi.Repositories
         Task<List<GetCustomerOrderProductDto>> GetCustomerOrderProducts(int hardwareStoreId, int orderId, int branchId);
         Task<List<GetCustomerOrderProductHistoryDto>> GetCustomerOrderProductsHistory(int customerId, int orderId);
         Task<(bool,string)> UpdateOrder(int hardwareStoreId, int orderId, UpdateOrderDto model, int hardwareStoreUserId);
-        Task<bool> ApproveOrder(int branchId, int orderId);
+        Task<bool> ApproveOrder(int branchId, int orderId, int salesClerkId);
     }
 }

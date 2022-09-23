@@ -2,6 +2,7 @@
 using ConstructionMaterialOrderingApi.Dtos.CartDtos;
 using ConstructionMaterialOrderingApi.Dtos.OrderDtos;
 using ConstructionMaterialOrderingApi.Dtos.ProductDtos;
+using ConstructionMaterialOrderingApi.Helpers;
 using ConstructionMaterialOrderingApi.Hubs;
 using ConstructionMaterialOrderingApi.Models;
 using Microsoft.AspNetCore.Http;
@@ -67,7 +68,7 @@ namespace ConstructionMaterialOrderingApi.Repositories
                     IsCustomerOrderRecieved = false,
                     IsOrderCanceled = false,
                     OrderDate = DateTime.Now,
-                    Status = "Pending",
+                    Status = OrderStatus.PENDING,
                     IsApproved = false,
                     ShippingFee = model.ShippingFee
                 };
@@ -595,13 +596,27 @@ namespace ConstructionMaterialOrderingApi.Repositories
             return (false,"Something went wrong.");
         }
 
-        public async Task<bool> ApproveOrder(int branchId, int orderId)
+        public async Task<bool> ApproveOrder(int branchId, int orderId, int salesClerkId)
         {
             var orderToApprove = await _context.Orders.Where(o => o.BranchId == branchId && o.Id == orderId)
                 .FirstOrDefaultAsync();
+            var salesClerk = await _context.SalesClerks.FirstOrDefaultAsync(sc => sc.Id == salesClerkId);
+
+            if(salesClerk == null) return false;
+
             if(orderToApprove != null && !orderToApprove.IsApproved)
             {
                 orderToApprove.IsApproved = true;
+                orderToApprove.Status = OrderStatus.PREPARING;
+
+                await _context.OrderToPrepares.AddAsync(new OrderToPrepare
+                    {
+                        OrderId = orderToApprove.Id,
+                        Order = orderToApprove,
+                        SalesClerkId = salesClerk.Id,
+                        SalesClerk = salesClerk
+                    });
+
                 await _context.SaveChangesAsync();
                 return true;
             }

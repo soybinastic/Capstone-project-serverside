@@ -1,4 +1,5 @@
 ﻿using ConstructionMaterialOrderingApi.Implementations;
+using ConstructionMaterialOrderingApi.Models;
 using ConstructionMaterialOrderingApi.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using Stripe.Checkout;
@@ -50,6 +51,9 @@ namespace ConstructionMaterialOrderingApi
             services.AddTransient<IVerificationRepository, VerificationRepository>();
             services.AddTransient<IDashboardRepository, DashboardRepository>();
             services.AddTransient<IPaymentRepository<Session>, PaymentRepository>();
+            services.AddTransient<IBranchUserRepository<Cashier>, CashierRepository>();
+            services.AddTransient<IBranchUserRepository<SalesClerk>, SalesClerkRepository>();
+            services.AddTransient<IOrderPreparationRepository, OrderPreparationRepository>();
         }
     }
 }
