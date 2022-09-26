@@ -42,7 +42,7 @@ namespace ConstructionMaterialOrderingApi.Repositories
                     .ToListAsync();
             return productsPendingInCart;
         }
-        public async Task<bool> AddToCart(int customerId, AddToCartDto model)
+        public async Task<bool> AddToCart(int customerId, AddToCartDto model, int quantity)
         {
             if(customerId != 0)
             {
@@ -53,13 +53,13 @@ namespace ConstructionMaterialOrderingApi.Repositories
                 var product = await _context.Products.Where(p => p.HardwareProductId == model.ProductId && p.HardwareStoreId == model.HardwareStoreId && p.BranchId == model.BranchId)
                         .FirstOrDefaultAsync();
                 
-                if(product.StockNumber > 0)
+                if(product.StockNumber > 0 && product.StockNumber >= quantity)
                 {
                     if (productInCartIsExist != null)
                     {
 
-                        productInCartIsExist.ProductQuantity += 1;
-                        product.StockNumber -= 1;
+                        productInCartIsExist.ProductQuantity += quantity;
+                        product.StockNumber -= quantity;
 
                         await _context.SaveChangesAsync();
                         //if (product.StockNumber >= productInCartIsExist.ProductQuantity)
@@ -86,11 +86,11 @@ namespace ConstructionMaterialOrderingApi.Repositories
                             ProductBrand = model.ProductBrand,
                             ProductQuality = model.ProductQuality,
                             ProductPrice = model.ProductPrice,
-                            ProductQuantity = 1,
+                            ProductQuantity = quantity,
                             DateAddedToCart = DateTime.Now
                         };
 
-                        product.StockNumber -= 1;
+                        product.StockNumber -= quantity;
 
                         await _context.Carts.AddAsync(cart);
                         await _context.SaveChangesAsync();
@@ -131,6 +131,34 @@ namespace ConstructionMaterialOrderingApi.Repositories
                 p.BranchId == branchId).FirstOrDefaultAsync();
             var cart = await _context.Carts.Where(c => c.Id == cartId && c.CustomerId == customerId && c.ProductId == productId && c.HardwareStoreId == hardwareStoreId && c.BranchId == branchId)
                     .FirstOrDefaultAsync();
+            if(cart == null && product != null)
+            {
+                if(product.StockNumber > 0 && product.StockNumber >= quantity)
+                {
+                    var cartToAdd = new Cart()
+                        {
+                            CustomerId = customerId,
+                            HardwareStoreId = hardwareStoreId,
+                            BranchId = branchId,
+                            ProductId = productId,
+                            CategoryId = product.CategoryId,
+                            ProductName = product.Name,
+                            ProductDescription = product.Description,
+                            ProductBrand = product.Brand,
+                            ProductQuality = product.Quality,
+                            ProductPrice = product.Price,
+                            ProductQuantity = quantity,
+                            DateAddedToCart = DateTime.Now
+                        };
+
+                        product.StockNumber -= 1;
+
+                        await _context.Carts.AddAsync(cartToAdd);
+                        await _context.SaveChangesAsync();
+                        return true;
+                }
+                return false;
+            }  
 
             if(product != null && cart != null && quantity > 0)
             {

@@ -108,6 +108,11 @@ namespace ConstructionMaterialOrderingApi.Repositories
                 double sales = orderItems.Sum(oi => oi.ProductPrice * oi.ProductQuantity);
                 double profit = orderItems.Sum(oi => (oi.ProductPrice * oi.ProductQuantity) * _profitOption.Value);
 
+                // var dashboardSale = await _db.Dashboard
+                //     .Include(d => d.Branch)
+                //     .Where(d => d.BranchId == branchId
+                //     && datenow.Date <= d.DueDate.Date)
+                //     .FirstOrDefaultAsync();
                 var dashboardSale = await _db.Dashboard
                     .Include(d => d.Branch)
                     .Where(d => d.BranchId == branchId
@@ -118,19 +123,20 @@ namespace ConstructionMaterialOrderingApi.Repositories
                 {
                     dashboardSale.SalesOfMonth += sales;
                     dashboardSale.OriginalSales = dashboardSale.SalesOfMonth - (dashboardSale.SalesOfMonth * _profitOption.Value);
-                    dashboardSale.PlatformFee = (dashboardSale.SalesOfMonth > minimumsalesOfMonth) ? 1000 : 0;
+                    dashboardSale.PlatformFee = (PlatformFeeIsAdded(branch.DateRegistered) && dashboardSale.SalesOfMonth > minimumsalesOfMonth) ? 1000 : 0;
                     dashboardSale.Profit += profit;
                     dashboardSale.Total += profit;
                     await _db.SaveChangesAsync();
                 }
                 else
                 {   
+                    // DateTimeHelper.GetDueDate(branch.DateRegistered, datenow).AddDays(-1)
                     dashboardSale = new Dashboard 
                     {
                         BranchId = branchId,
                         Branch = branch,
-                        DueDate = DateTimeHelper.GetDueDate(branch.DateRegistered, datenow).AddDays(-1),
-                        PlatformFee = (sales > minimumsalesOfMonth) ? 1000 : 0,
+                        DueDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month)),
+                        PlatformFee = (PlatformFeeIsAdded(branch.DateRegistered) && sales > minimumsalesOfMonth) ? 1000 : 0,
                         SalesOfMonth = sales,
                         OriginalSales = sales - (sales * _profitOption.Value),
                         Profit = profit,
@@ -143,6 +149,17 @@ namespace ConstructionMaterialOrderingApi.Repositories
                     await _db.SaveChangesAsync();
                 }
             }
+        }
+
+        private bool PlatformFeeIsAdded(DateTime registeredDate)
+        {
+            var firstDayOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            if(firstDayOfMonth.Year == registeredDate.Year && firstDayOfMonth.Month == registeredDate.Month && firstDayOfMonth.Day < registeredDate.Day)
+            {
+                return false;
+            }
+
+            return true;
         }
 
     }

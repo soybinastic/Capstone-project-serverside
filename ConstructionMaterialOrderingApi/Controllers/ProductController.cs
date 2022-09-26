@@ -33,9 +33,14 @@ namespace ConstructionMaterialOrderingApi.Controllers
         }
         [HttpGet]
         [Route("get-hardwareproducts/{branchId}")]
-        public async Task<IActionResult> GetHardwareProducts([FromRoute] int branchId)
+        public async Task<IActionResult> GetHardwareProducts([FromRoute] int branchId, [FromQuery(Name = "search")]string search)
         {
             var products = await _productRepository.GetHardwareProducts(branchId);
+            if(string.IsNullOrWhiteSpace(search))
+            {
+                return Ok(ConvertToJson(products));
+            }
+            products = products.Where(p => p.Name.ToLower().Contains(search.ToLower())).ToList();
             return Ok(ConvertToJson(products));
         }
         [HttpGet]

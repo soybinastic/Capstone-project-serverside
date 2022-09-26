@@ -9,7 +9,7 @@ namespace ConstructionMaterialOrderingApi.Repositories
 {
     public interface ICartRepository
     {
-        Task<bool> AddToCart(int customerId,AddToCartDto model);
+        Task<bool> AddToCart(int customerId,AddToCartDto model, int quantity);
         Task<bool> DeleteCartItem(int cartId, int branchId);
         Task<List<Cart>> ProductsPendingInCart(int branchId);
         Task<List<GetProductToCartDto>> GetAllProductsToCart(int customerId, int hardwareStoreId, int branchId);

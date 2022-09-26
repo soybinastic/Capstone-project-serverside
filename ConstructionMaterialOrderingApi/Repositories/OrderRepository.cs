@@ -494,7 +494,7 @@ namespace ConstructionMaterialOrderingApi.Repositories
                 StringBuilder notification = new StringBuilder();
                 //var customerOrderHistory = await _context.CustomerOrderHistories.Where(o => o.HardwareStoreId == hardwareStoreId && o.OrderId == model.OrderId)
                 //.FirstOrDefaultAsync();
-                if(customerOrder != null && orderProducts != null && customerOrder.IsApproved)
+                if(customerOrder != null && orderProducts != null)
                 {
                     //admin part
                     //customerOrder.CustomerName = model.CustomerName;
@@ -589,7 +589,7 @@ namespace ConstructionMaterialOrderingApi.Repositories
                     //return (true,"");
                 }
 
-                return (false,"Order not found or no have approval");
+                return (false,"Order not found");
 
             }
 
@@ -604,7 +604,7 @@ namespace ConstructionMaterialOrderingApi.Repositories
 
             if(salesClerk == null) return false;
 
-            if(orderToApprove != null && !orderToApprove.IsApproved)
+            if(orderToApprove != null && !orderToApprove.IsApproved && orderToApprove.Status == OrderStatus.PENDING)
             {
                 orderToApprove.IsApproved = true;
                 orderToApprove.Status = OrderStatus.PREPARING;
@@ -636,6 +636,12 @@ namespace ConstructionMaterialOrderingApi.Repositories
                     await _context.SaveChangesAsync();
                 }
             }
+        }
+
+        public async Task<Order> GetOrder(int orderId)
+        {
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == orderId);
+            return order;
         }
     }
 }

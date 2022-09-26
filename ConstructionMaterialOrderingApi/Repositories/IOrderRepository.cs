@@ -11,6 +11,7 @@ namespace ConstructionMaterialOrderingApi.Repositories
     {
         Task<bool> PostOrder(PostOrderDto model, int customerId);
         Task<Order> GetOrder(int orderId, int branchId);
+        Task<Order> GetOrder(int orderId);
         Task<List<GetOrderDto>> GetAllOrders(int hardwareStoreId, int branchId);
         Task<List<GetCustomerOrderHistoryDto>> GetAllCustomerOrdersHistory(int customerId);
         Task<GetOrderNotificationNumber> GetOrderNotifNumber(int hardwareStoreId, int branchId);

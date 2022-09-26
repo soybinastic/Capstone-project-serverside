@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using ConstructionMaterialOrderingApi.Context;
 using ConstructionMaterialOrderingApi.Dtos.BranchDto;
 using ConstructionMaterialOrderingApi.Helpers;
 using ConstructionMaterialOrderingApi.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace ConstructionMaterialOrderingApi.Repositories
@@ -29,7 +32,8 @@ namespace ConstructionMaterialOrderingApi.Repositories
                 Name = branchDto.BranchName,
                 Address = branchDto.Address,
                 IsActive = branchDto.IsActive,
-                DateRegistered = DateTime.Now
+                DateRegistered = DateTime.Now,
+                Image = branchDto.Image != null ? await UploadFile(branchDto.Image, "BranchImages") : ""
             };
             _context.Branches.Add(newBranch);
             await _context.SaveChangesAsync();
@@ -71,6 +75,7 @@ namespace ConstructionMaterialOrderingApi.Repositories
 
         public async Task<bool> UpdateBranch(UpdateBranchDto branchDto, int branchId, int hardwareStoreId)
         {
+            Console.WriteLine("File length: " + branchDto.Image?.Length);
             if(branchDto.Id == branchId && branchId != 0 && branchDto.Id != 0)
             {
                 var branchToUpdate = await _context.Branches
@@ -84,6 +89,7 @@ namespace ConstructionMaterialOrderingApi.Repositories
                     branchToUpdate.Latitude = branchDto.Lat;
                     branchToUpdate.Longitude = branchDto.Lng;
                     branchToUpdate.Range = branchDto.Range;
+                    branchToUpdate.Image = branchDto.Image != null ? await UploadFile(branchDto.Image, "BranchImages") : branchToUpdate.Image;
                     await _context.SaveChangesAsync();
 
                     return true;
@@ -96,6 +102,41 @@ namespace ConstructionMaterialOrderingApi.Repositories
             else
             {
                 return false;
+            }
+        }
+
+        private async Task<string> UploadFile(IFormFile file, string folderNamePath)
+        {
+            try
+            {
+                var folderName = Path.Combine("Resources", folderNamePath);
+                var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+
+                if (!Directory.Exists(pathToSave))
+                {
+                    Directory.CreateDirectory(pathToSave);
+                }
+
+                if (file.Length > 0)
+                {
+                    var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                    var fullPath = Path.Combine(pathToSave, fileName);
+                    var dbPath = Path.Combine(folderName, fileName);
+
+                    using (var stream = new FileStream(fullPath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    return dbPath;
+                }
+
+                return "";
+
+            }
+            catch (Exception e)
+            {
+                return "";
             }
         }
 

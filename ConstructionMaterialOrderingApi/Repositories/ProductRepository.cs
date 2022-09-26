@@ -39,7 +39,8 @@ namespace ConstructionMaterialOrderingApi.Repositories
                     Price = (double)hardwareProduct.CostPrice,
                     StockNumber = quantity,
                     IsAvailable = IsAvailableProduct(quantity),
-                    IsAvailableInWarehouse = false
+                    IsAvailableInWarehouse = false,
+                    ImageFile = hardwareProduct.ImageFile
                 };
 
                 await _context.Products.AddAsync(product);

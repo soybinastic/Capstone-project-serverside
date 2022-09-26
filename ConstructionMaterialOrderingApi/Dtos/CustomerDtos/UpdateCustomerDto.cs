@@ -13,13 +13,9 @@ namespace ConstructionMaterialOrderingApi.Dtos.CustomerDtos
         [Required]
         public string LastName { get; set; }
         [Required]
-        public string MiddleName { get; set; }
-        [Required]
         public string Address { get; set; }
         [Required]
         public string ContactNo { get; set; }
-        [Required]
-        public int Age { get; set; }
         [Required]
         public DateTime BirthDate { get; set; }
         public double Lat { get; set; }

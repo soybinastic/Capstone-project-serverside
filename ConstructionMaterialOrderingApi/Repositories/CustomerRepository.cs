@@ -75,10 +75,10 @@ namespace ConstructionMaterialOrderingApi.Repositories
             {
                 customer.FirstName = customerDto.FirstName;
                 customer.LastName = customerDto.LastName;
-                customer.MiddleName = customerDto.MiddleName;
+                // customer.MiddleName = customerDto.MiddleName;
                 customer.Address = customerDto.Address;
                 customer.ContactNo = customerDto.ContactNo;
-                customer.Age = customerDto.Age;
+                // customer.Age = customerDto.Age;
                 customer.BirthDate = customerDto.BirthDate;
                 customer.Latitude = customerDto.Lat;
                 customer.Longitude = customerDto.Lng;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace ConstructionMaterialOrderingApi.Dtos.BranchDto
 {
@@ -17,5 +18,6 @@ namespace ConstructionMaterialOrderingApi.Dtos.BranchDto
         public double Lat { get; set; }
         public double Lng { get; set; }
         public double Range { get; set; }
+        public IFormFile Image { get; set; }
     }
 }

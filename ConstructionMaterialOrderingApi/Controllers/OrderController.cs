@@ -246,24 +246,37 @@ namespace ConstructionMaterialOrderingApi.Controllers
 
         [HttpPut]
         [Route("/api/order/update-order/{orderId}")]
-        [Authorize(Roles = "StoreAdmin,TransportAgent")]
+        [Authorize(Roles = "StoreAdmin,TransportAgent,Customer")]
         public async Task<IActionResult> UpdateOrder(int orderId, [FromBody] UpdateOrderDto model)
         {
             var hardwareStoreUserAccountId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var hardwareStoreUser = await _userManager.FindByIdAsync(hardwareStoreUserAccountId);
             var role = await _userManager.GetRolesAsync(hardwareStoreUser);
 
-            var user = await _hardwareStoreUserRepository.GetUserByAccountId(hardwareStoreUserAccountId);
+            
             if(role.FirstOrDefault() == "StoreAdmin")
             {
+                var user = await _hardwareStoreUserRepository.GetUserByAccountId(hardwareStoreUserAccountId);
                 var storeAdmin = await _storeAdminRepository.GetStoreAdminByAccountId(hardwareStoreUserAccountId);
                 (bool result, string message) = await _orderRepository.UpdateOrder(storeAdmin.HardwareStoreId, orderId, model, user.Id);
                 return result ? Ok(new { Success = 1, Message = message}) : BadRequest(new { Success = 0, Message = message });
             } 
             else if(role.FirstOrDefault() == "TransportAgent")
             {
+                var user = await _hardwareStoreUserRepository.GetUserByAccountId(hardwareStoreUserAccountId);
                 var transportAgent = await _transportAgentRepository.GetTransportAgentByAccountID(hardwareStoreUserAccountId);
                 (bool result, string message) = await _orderRepository.UpdateOrder(transportAgent.HardwareStoreId, orderId, model, user.Id);
+                return result ? Ok(new { Success = 1, Message = message }) : BadRequest(new { Success = 0, Message = message });
+            }
+            else if(role.FirstOrDefault() == UserRole.CUSTOMER)
+            {
+                var order = await _orderRepository.GetOrder(orderId);
+                if(order.Status != OrderStatus.PENDING && model.IsCancelled)
+                {
+                    return BadRequest(new { Success = 0, Message = "The order has been approved by the admin, you cannot cancel it because your order is on process." });
+                }
+                // update the order to cancelled.
+                (bool result, string message) = await _orderRepository.UpdateOrder(order.HardwareStoreId, orderId, model, 0);
                 return result ? Ok(new { Success = 1, Message = message }) : BadRequest(new { Success = 0, Message = message });
             }
 
@@ -323,6 +336,9 @@ namespace ConstructionMaterialOrderingApi.Controllers
         {
             var salesClerkAvailable = await _orderPreparationRepository.SalesClerkAvailable(salesClerkId);
             if(!salesClerkAvailable) return BadRequest(new { Success = 0, Message = "The selected sales clerk not yet available."});
+            
+            var order = await _orderRepository.GetOrder(orderId);
+            if(order.Status == OrderStatus.CANCELLED) return BadRequest(new { Success = 0, Message = "The order cancelled by the customer, you cannot approve this order."});
 
             var userAppId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var storeAdmin = await _storeAdminRepository.GetStoreAdminByAccountId(userAppId);

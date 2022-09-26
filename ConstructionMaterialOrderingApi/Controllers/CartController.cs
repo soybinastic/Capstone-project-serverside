@@ -34,12 +34,12 @@ namespace ConstructionMaterialOrderingApi.Controllers
         [HttpPost]
         [Route("/api/cart/add-to-cart")]
         [Authorize(Roles = "Customer")]
-        public async Task<IActionResult> AddToCart([FromBody] AddToCartDto model)
+        public async Task<IActionResult> AddToCart([FromBody] AddToCartDto model, [FromQuery(Name = "qty")]int quantity = 1)
         {
             var customerUserAccountId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customer = await _customerRepository.GetCustomerByAccountId(customerUserAccountId);
 
-            var result = await _cartRepository.AddToCart(customer.CustomerId, model);
+            var result = await _cartRepository.AddToCart(customer.CustomerId, model, quantity);
 
             return result ? Ok(new { Success = 1, Message = "Successfully added to cart"}) : BadRequest(new { Succes = 0, Message = "Failed to add"});
         }  

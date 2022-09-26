@@ -30,7 +30,7 @@ namespace ConstructionMaterialOrderingApi.Controllers
         [HttpPost]
         [Route("add-branch")]
         [Authorize(Roles = "StoreOwner,SuperAdmin")]
-        public async Task<IActionResult> AddBranch([FromBody]AddBranchDto branchDto)
+        public async Task<IActionResult> AddBranch([FromForm]AddBranchDto branchDto)
         {
             var hardwareStoreAppUserId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var hardwareStoreUserInfo = await _hardwareStoreUserRepository.GetUserByAccountId(hardwareStoreAppUserId);
@@ -70,7 +70,7 @@ namespace ConstructionMaterialOrderingApi.Controllers
         [HttpPut]
         [Route("update-branch/{branchId}")]
         [Authorize(Roles = "StoreOwner,SuperAdmin")]
-        public async Task<IActionResult> UpdateBranch([FromBody]UpdateBranchDto branchDto,
+        public async Task<IActionResult> UpdateBranch([FromForm]UpdateBranchDto branchDto,
             int branchId)
         {
             var hardwareStoreAppUserId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
