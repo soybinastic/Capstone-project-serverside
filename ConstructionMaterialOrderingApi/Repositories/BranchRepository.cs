@@ -76,12 +76,12 @@ namespace ConstructionMaterialOrderingApi.Repositories
         public async Task<bool> UpdateBranch(UpdateBranchDto branchDto, int branchId, int hardwareStoreId)
         {
             Console.WriteLine("File length: " + branchDto.Image?.Length);
-            if(branchDto.Id == branchId && branchId != 0 && branchDto.Id != 0)
+            if (branchDto.Id == branchId && branchId != 0 && branchDto.Id != 0)
             {
                 var branchToUpdate = await _context.Branches
                     .Where(b => b.Id == branchId && b.HardwareStoreId == hardwareStoreId)
                     .FirstOrDefaultAsync();
-                if(branchToUpdate != null)
+                if (branchToUpdate != null)
                 {
                     branchToUpdate.Name = branchDto.BranchName;
                     branchToUpdate.Address = branchDto.Address;
@@ -144,9 +144,9 @@ namespace ConstructionMaterialOrderingApi.Repositories
         {
             var branches = await _context.Branches.ToListAsync();
 
-            if(lat == 0 || lng == 0)
+            if (lat == 0 || lng == 0)
             {
-                var branchesDto = branches.Select(b => new BranchDto(b.Id, b.HardwareStoreId, b.Name, b.Address, b.IsActive, b.DateRegistered,
+                var branchesDto = branches.Where(b => b.IsActive).Select(b => new BranchDto(b.Id, b.HardwareStoreId, b.Name, b.Address, b.IsActive, b.DateRegistered,
                     b.Longitude, b.Latitude, b.Range, b.Image, 0))
                     .ToList();
 
@@ -170,7 +170,7 @@ namespace ConstructionMaterialOrderingApi.Repositories
         {
             var branches = await GetAllBranches(lat, lng, adjustedKm);
             //search = search.Trim('\'');
-            if(string.IsNullOrWhiteSpace(search))
+            if (string.IsNullOrWhiteSpace(search))
             {
                 return branches;
             }

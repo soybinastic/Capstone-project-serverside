@@ -16,7 +16,7 @@ namespace ConstructionMaterialOrderingApi.Repositories
         private readonly ApplicationDbContext _db;
         private readonly IPaymentRepository<Session> _paymentRepository;
         private readonly ProfitOption _profitOption;
-        public DashboardRepository(ApplicationDbContext db, IOptions<ProfitOption> profitOption, 
+        public DashboardRepository(ApplicationDbContext db, IOptions<ProfitOption> profitOption,
             IPaymentRepository<Session> paymentRepository)
         {
             _db = db;
@@ -32,12 +32,12 @@ namespace ConstructionMaterialOrderingApi.Repositories
             //     .ThenByDescending(d => d.Total)
             //     .Include(d => d.Branch)
             //     .ToListAsync();
-            var dashboard = await _db.Dashboard.Where(d => d.Status == Keyword.ON_GOING ||  d.Status == Keyword.UN_PAID)
+            var dashboard = await _db.Dashboard.Where(d => d.Status == Keyword.ON_GOING || d.Status == Keyword.UN_PAID)
                 .OrderBy(d => d.Status == Keyword.UN_PAID)
                 .ThenByDescending(d => d.Total)
                 .Include(d => d.Branch)
                 .ToListAsync();
-            
+
             return dashboard;
         }
 
@@ -48,7 +48,7 @@ namespace ConstructionMaterialOrderingApi.Repositories
                 .Where(d => d.BranchId == branchId)
                 .OrderBy(d => d.Date.Date)
                 .ToListAsync();
-            
+
             return dashboards;
         }
         public async Task<Dashboard> GetById(int dashboardId)
@@ -66,31 +66,34 @@ namespace ConstructionMaterialOrderingApi.Repositories
             DateTime datenow = DateTime.Now;
 
             var dashboard = await _db.Dashboard.Where(d => d.BranchId == branchId && (d.Date.Year == datenow.Year
-                && d.Date.Month == datenow.Month) ||  d.Status == Keyword.UN_PAID)
+                && d.Date.Month == datenow.Month) || d.Status == Keyword.UN_PAID)
                 .OrderBy(d => d.Status == Keyword.UN_PAID)
                 .ThenByDescending(d => d.Total)
                 .Include(d => d.Branch)
                 .ToListAsync();
-            
+
             return dashboard;
         }
 
         public async Task UpdateStatus(int dashboardId, string status = "PAID")
         {
-            var dashboard = await _db.Dashboard.Where(d => d.Id == dashboardId && d.Status != Keyword.ON_GOING && d.Status != Keyword.PAID)
+            var dashboard = await _db.Dashboard
+                .Include(d => d.Branch)
+                .Where(d => d.Id == dashboardId && d.Status != Keyword.ON_GOING && d.Status != Keyword.PAID)
                 .FirstOrDefaultAsync();
-            if(dashboard == null) return;
+            if (dashboard == null) return;
 
             dashboard.Status = status;
+            dashboard.Branch.IsActive = true;
             await _db.SaveChangesAsync();
-            await _paymentRepository.Create(new PaymentDetail 
-                {
-                    DashboardId = dashboardId,
-                    Dashboard = dashboard,
-                    PaidAt = DateTime.UtcNow,
-                    PaymentGateway = "Stripe",
-                    TotalAmount = dashboard.Total + dashboard.PlatformFee
-                });
+            await _paymentRepository.Create(new PaymentDetail
+            {
+                DashboardId = dashboardId,
+                Dashboard = dashboard,
+                PaidAt = DateTime.UtcNow,
+                PaymentGateway = "Stripe",
+                TotalAmount = dashboard.Total + dashboard.PlatformFee
+            });
         }
 
         public async Task Upsert(List<CustomerOrderProduct> orderItems, int branchId, DateTime datenow)
@@ -99,11 +102,11 @@ namespace ConstructionMaterialOrderingApi.Repositories
             // to ensure the function.
             // not totally fix yet.
             const double minimumsalesOfMonth = 5000;
-            
-            
+
+
             var branch = await _db.Branches.Where(b => b.Id == branchId).FirstOrDefaultAsync();
 
-            if(branch != null)
+            if (branch != null)
             {
                 double sales = orderItems.Sum(oi => oi.ProductPrice * oi.ProductQuantity);
                 double profit = orderItems.Sum(oi => (oi.ProductPrice * oi.ProductQuantity) * _profitOption.Value);
@@ -118,8 +121,8 @@ namespace ConstructionMaterialOrderingApi.Repositories
                     .Where(d => d.BranchId == branchId
                     && datenow.Date <= d.DueDate.Date)
                     .FirstOrDefaultAsync();
-            
-                if(dashboardSale != null)
+
+                if (dashboardSale != null)
                 {
                     dashboardSale.SalesOfMonth += sales;
                     dashboardSale.OriginalSales = dashboardSale.SalesOfMonth - (dashboardSale.SalesOfMonth * _profitOption.Value);
@@ -129,9 +132,9 @@ namespace ConstructionMaterialOrderingApi.Repositories
                     await _db.SaveChangesAsync();
                 }
                 else
-                {   
+                {
                     // DateTimeHelper.GetDueDate(branch.DateRegistered, datenow).AddDays(-1)
-                    dashboardSale = new Dashboard 
+                    dashboardSale = new Dashboard
                     {
                         BranchId = branchId,
                         Branch = branch,
@@ -154,7 +157,7 @@ namespace ConstructionMaterialOrderingApi.Repositories
         private bool PlatformFeeIsAdded(DateTime registeredDate)
         {
             var firstDayOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-            if(firstDayOfMonth.Year == registeredDate.Year && firstDayOfMonth.Month == registeredDate.Month && firstDayOfMonth.Day < registeredDate.Day)
+            if (firstDayOfMonth.Year == registeredDate.Year && firstDayOfMonth.Month == registeredDate.Month && firstDayOfMonth.Day < registeredDate.Day)
             {
                 return false;
             }
