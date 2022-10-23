@@ -10,6 +10,6 @@ namespace ConstructionMaterialOrderingApi.Repositories
         Task<CustomerVerification> Get(int id);
         Task<List<CustomerVerification>> GetAll();
         Task<(bool, string)> Post(VerificationDetail verificationDetail, int customerId);
-        Task<(bool, string)> VerifyCustomer(int customerId);
+        Task<(bool, string)> VerifyCustomer(int customerId, string fastlineUserId);
     }
 }

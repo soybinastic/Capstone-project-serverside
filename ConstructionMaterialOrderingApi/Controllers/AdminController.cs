@@ -1,4 +1,5 @@
-﻿using ConstructionMaterialOrderingApi.Dtos.AdminDtos;
+﻿using ConstructionMaterialOrderingApi.Context;
+using ConstructionMaterialOrderingApi.Dtos.AdminDtos;
 using ConstructionMaterialOrderingApi.Dtos.HardwareStoreUserDto;
 using ConstructionMaterialOrderingApi.Helpers;
 using ConstructionMaterialOrderingApi.Models;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace ConstructionMaterialOrderingApi.Controllers
@@ -22,15 +24,19 @@ namespace ConstructionMaterialOrderingApi.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IHardwareStoreRepository _hardwareStoreRepository;
         private readonly IHardwareStoreUserRepository _hardwareStoreUserRepository;
+        private readonly ApplicationDbContext _db;
 
         public AdminController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager,
-            IHardwareStoreRepository hardwareStoreRepository, IHardwareStoreUserRepository hardwareStoreUserRepository)
+            IHardwareStoreRepository hardwareStoreRepository,
+            IHardwareStoreUserRepository hardwareStoreUserRepository,
+            ApplicationDbContext db)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _hardwareStoreRepository = hardwareStoreRepository;
             _hardwareStoreUserRepository = hardwareStoreUserRepository;
-        } 
+            _db = db;
+        }
         [HttpPost]
         [Route("/api/admin/add-role")]
         public async Task<IActionResult> AddRole([FromBody] AddRoleDto roleDto)
@@ -39,21 +45,21 @@ namespace ConstructionMaterialOrderingApi.Controllers
             var role = new IdentityRole()
             {
                 Name = roleDto.RoleName
-            }; 
-            if(await _roleManager.RoleExistsAsync(roleDto.RoleName))
+            };
+            if (await _roleManager.RoleExistsAsync(roleDto.RoleName))
             {
-                return BadRequest(new { Success = 0, Message = $"Role {roleDto.RoleName} is already exist."});
+                return BadRequest(new { Success = 0, Message = $"Role {roleDto.RoleName} is already exist." });
             }
-            if(!allUserRoles.Any(r => r == roleDto.RoleName))
+            if (!allUserRoles.Any(r => r == roleDto.RoleName))
             {
-                return BadRequest(new { Success = 0, Message = "Invalid Rolename"});
+                return BadRequest(new { Success = 0, Message = "Invalid Rolename" });
             }
             var result = await _roleManager.CreateAsync(role);
-            IActionResult response = result.Succeeded ? Ok(new { Success = 1, Message = $"Role {roleDto.RoleName} is added successfully." }) : 
-                BadRequest(new { Success = 0, Message = "Something went wrong."});
+            IActionResult response = result.Succeeded ? Ok(new { Success = 1, Message = $"Role {roleDto.RoleName} is added successfully." }) :
+                BadRequest(new { Success = 0, Message = "Something went wrong." });
 
             return response;
-        } 
+        }
         [HttpPost]
         [Route("/api/admin/add-admin")]
         // [Authorize(Roles = "Admin")]
@@ -61,9 +67,9 @@ namespace ConstructionMaterialOrderingApi.Controllers
         {
             string role = "Admin";
             var isAdminExist = await _userManager.FindByNameAsync(addAdminDto.UserName);
-            if(isAdminExist != null)
+            if (isAdminExist != null)
             {
-                return BadRequest(new { Success = 0, Messasge = "Admin username is already exist."});
+                return BadRequest(new { Success = 0, Messasge = "Admin username is already exist." });
             }
             var admin = new ApplicationUser()
             {
@@ -77,25 +83,26 @@ namespace ConstructionMaterialOrderingApi.Controllers
                 return BadRequest(new { Success = 0, Messasge = "Role is not exist." });
 
             var result = await _userManager.CreateAsync(admin, addAdminDto.Password);
-            if(result.Succeeded)
+            if (result.Succeeded)
             {
                 var adminUser = await _userManager.FindByNameAsync(addAdminDto.UserName);
                 await _userManager.AddToRoleAsync(adminUser, role);
-                return Ok(new { Success = 1, Message = "Added Successfully."});
+                return Ok(new { Success = 1, Message = "Added Successfully." });
             }
 
-            return BadRequest(new { Success = 0, Message = "Something went wrong."});
+            return BadRequest(new { Success = 0, Message = "Something went wrong." });
         }
         [HttpPost]
         [Route("/api/admin/register-hardware-store")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,CompanyValidator")]
         public async Task<IActionResult> RegisterHardwareStore([FromBody] RegisterHardwareStoreDto model)
         {
+            var userId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             string role = UserRole.STORE_OWNER;
             var isExist = await _userManager.FindByNameAsync(model.UserName);
-            if(isExist != null)
+            if (isExist != null)
             {
-                return BadRequest(new { Success = 0, Message = "Username is already taken"});
+                return BadRequest(new { Success = 0, Message = "Username is already taken" });
             }
 
             if (!await _roleManager.RoleExistsAsync(role))
@@ -128,10 +135,17 @@ namespace ConstructionMaterialOrderingApi.Controllers
                 await _userManager.AddToRoleAsync(user, role);
                 var hardwareStore = _hardwareStoreRepository.AddHardwareStore(user.Id, model);
                 await _hardwareStoreUserRepository.AddUser(storeOwnerUser, user.Id, hardwareStore.Id);
-                return Ok(new { Success = 1, Message = $"{model.HardwareStoreName} is registered successfully."});
+                await _db.RegisteredCompanies.AddAsync(new RegisteredCompany
+                {
+                    HardwareStoreId = hardwareStore.Id,
+                    HardwareStore = hardwareStore,
+                    RegisteredBy = userId
+                });
+                await _db.SaveChangesAsync();
+                return Ok(new { Success = 1, Message = $"{model.HardwareStoreName} is registered successfully." });
             }
 
-            return BadRequest(new { Success = 0, Message = "Something went wrong"});
+            return BadRequest(new { Success = 0, Message = "Something went wrong" });
         }
     }
 }

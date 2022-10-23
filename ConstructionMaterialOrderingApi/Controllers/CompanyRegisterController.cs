@@ -20,27 +20,27 @@ namespace ConstructionMaterialOrderingApi.Controllers
         public CompanyRegisterController(ICompanyRegisterRepository companyRegisterRepository)
         {
             _companyRegisterRepository = companyRegisterRepository;
-        } 
+        }
 
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> Register([FromForm]RegisterDto registerDto)
+        public async Task<IActionResult> Register([FromForm] RegisterDto registerDto)
         {
             await _companyRegisterRepository.Register(registerDto);
-            return Ok(new { Success = 1, Message = "Successfully registered."});
+            return Ok(new { Success = 1, Message = "Successfully registered." });
         }
 
         [HttpGet]
         [Route("get/{id}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Get([FromRoute]int id)
+        [Authorize(Roles = "Admin,CompanyValidator")]
+        public async Task<IActionResult> Get([FromRoute] int id)
         {
             var companyRegister = await _companyRegisterRepository.Get(id);
             return Ok(ConvertToJson(companyRegister));
         }
         [HttpGet]
         [Route("get")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,CompanyValidator")]
         public async Task<IActionResult> GetAll()
         {
             var companyRegisters = await _companyRegisterRepository.GetAll();
@@ -50,7 +50,7 @@ namespace ConstructionMaterialOrderingApi.Controllers
         [HttpDelete]
         [Route("delete/{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Delete([FromRoute]int id)
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
             var result = await _companyRegisterRepository.Delete(id);
             return result ? Ok() : BadRequest();

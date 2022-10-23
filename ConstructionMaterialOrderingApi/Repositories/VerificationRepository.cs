@@ -58,7 +58,7 @@ namespace ConstructionMaterialOrderingApi.Repositories
         {
             var customer = await _context.Customers.Where(c => c.Id == customerId).FirstOrDefaultAsync();
 
-            if(customer == null)
+            if (customer == null)
             {
                 return (false, "User not found!");
             }
@@ -67,7 +67,7 @@ namespace ConstructionMaterialOrderingApi.Repositories
                 .Include(c => c.Customer)
                 .FirstOrDefaultAsync();
 
-            if(customerDetail != null && customerDetail.Customer.IsVerified)
+            if (customerDetail != null && customerDetail.Customer.IsVerified)
             {
                 return (false, "You are already verified by the system.");
             }
@@ -117,7 +117,7 @@ namespace ConstructionMaterialOrderingApi.Repositories
             return customerVerificationDetails;
         }
 
-        public async Task<(bool, string)> VerifyCustomer(int customerId)
+        public async Task<(bool, string)> VerifyCustomer(int customerId, string fastlineUserId)
         {
             var customer = await _context.Customers.Where(c => c.Id == customerId)
                 .FirstOrDefaultAsync();
@@ -128,6 +128,13 @@ namespace ConstructionMaterialOrderingApi.Repositories
                     customer.IsVerified = true;
                     await _context.SaveChangesAsync();
 
+                    await _context.VerifiedUsers.AddAsync(new VerifiedUser
+                    {
+                        CustomerId = customer.Id,
+                        Customer = customer,
+                        ConfirmedBy = fastlineUserId
+                    });
+                    await _context.SaveChangesAsync();
                     return (true, "Verified Successfully.");
                 }
 

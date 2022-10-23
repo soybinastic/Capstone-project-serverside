@@ -4,6 +4,8 @@ namespace ConstructionMaterialOrderingApi.Helpers
     public class UserRole
     {
         public const string ADMIN = "Admin";
+        public const string COMPANY_VALIDATOR = "CompanyValidator";
+        public const string USER_VALIDATOR = "UserValidator";
         public const string CUSTOMER = "Customer";
         public const string TRANSPORT_AGENT = "TransportAgent";
         public const string STORE_OWNER = "StoreOwner";
@@ -17,10 +19,11 @@ namespace ConstructionMaterialOrderingApi.Helpers
         {
             return new List<string>
                 {
-                    ADMIN, CUSTOMER, TRANSPORT_AGENT, 
+                    ADMIN, CUSTOMER, TRANSPORT_AGENT,
                     STORE_OWNER, STORE_ADMIN,
                     WAREHOUSE_ADMIN, SUPER_ADMIN,
-                    CASHIER, SALES_CLERK
+                    CASHIER, SALES_CLERK,
+                    COMPANY_VALIDATOR, USER_VALIDATOR
                 };
         }
     }

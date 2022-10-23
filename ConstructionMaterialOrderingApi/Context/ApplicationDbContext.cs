@@ -65,5 +65,8 @@ namespace ConstructionMaterialOrderingApi.Context
         public DbSet<Cashier> Cashiers { get; set; }
         public DbSet<SalesClerk> SalesClerks { get; set; }
         public DbSet<OrderToPrepare> OrderToPrepares { get; set; }
+        public DbSet<FastlineUser> FastlineUsers { get; set; }
+        public DbSet<VerifiedUser> VerifiedUsers { get; set; }
+        public DbSet<RegisteredCompany> RegisteredCompanies { get; set; }
     }
 }
